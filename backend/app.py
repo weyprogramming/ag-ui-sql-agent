@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from starlette.requests import Request
 from starlette.responses import Response
 
-from pydantic_ai import Agent
 from pydantic_ai.ag_ui import handle_ag_ui_request, StateDeps
 
 
@@ -14,8 +13,6 @@ load_dotenv()
 from state import State, SQLBaseDependency, SQLConnectionParams, SQLType
 from settings import settings
 from agent import agent
-
-
 
 sql_connection_params = SQLConnectionParams(
     type=SQLType.MSSQL,
@@ -34,15 +31,16 @@ sql_dep = SQLBaseDependency(
 metadata = sql_dep.get_metadata()
 sql_dep.set_tables_from_metadata(metadata)
 
-state_deps = StateDeps(State(sql_dependencies=[sql_dep]))
+state_deps = State(sql_dependency=sql_dep)
+
 
 app = FastAPI()
 
-
 @app.post("/")
 async def run_agent(request: Request) -> Response:
+    
     return await handle_ag_ui_request(
         agent=agent, 
         request=request,
-        deps=StateDeps(State())
+        deps=state_deps,
     )

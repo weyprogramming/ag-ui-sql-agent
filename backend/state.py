@@ -27,9 +27,13 @@ from pandas import read_sql_query, DataFrame
 
 from settings import settings
 
-class State(BaseModel):
-    sql_dependencies: List[SQLBaseDependency] = []
+from result import PandasDataFrame, PlotlyFigure
 
+class State(BaseModel):
+    sql_dependency: SQLBaseDependency
+    sql_query_result: PandasDataFrame | None = None
+    plotly_figure_result: PlotlyFigure | None = None
+    
 class SQLType(StrEnum):
     MSSQL = "mssql"
     MYSQL = "mysql"
