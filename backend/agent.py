@@ -3,6 +3,7 @@ import asyncio, json
 from concurrent.futures import ThreadPoolExecutor
 
 from pydantic_ai import Agent, RunContext, ModelRetry
+from pydantic_ai.tools import ToolDefinition, Tool
 from pydantic_ai.messages import ToolReturn
 from pydantic_ai.ag_ui import StateDeps
 
@@ -21,6 +22,21 @@ agent = Agent("openai:gpt-4o", deps_type=StateDeps[State])
 
 @agent.instructions
 def instructions(ctx: RunContext[State]) -> str:
+    return f"""
+        You are a data analysis agent.
+        You are working with a non technical user to help them analyze their data.
+        If the requirements are not clear, ask clarifying questions.
+        If there are serveral ways to solve a problem, explain the options and their pros and cons to the user.
+        For every step you make, explain it with non technical terms to the user.
+        Reply in the user's language.
+    """
+
+async def prepare_sql_tool(
+    ctx: RunContext[State], tool_def: ToolDefinition
+) -> ToolDefinition | None:
+    
+    if ctx.deps.sql_dependency is None:
+        return None
     
     if ctx.deps.sql_dependency.connection_params.type == SQLType.MSSQL:
             dialect_string = "You have to use the Microsoft SQL Server Dialect. For example, use 'TOP' instead of 'LIMIT.'"
@@ -36,20 +52,23 @@ def instructions(ctx: RunContext[State]) -> str:
             
     else:
         dialect_string = None
-        
-    return f"""
-        You are a SQL Expert working with the following SQL Database:
+    
+    tool_description = dedent(f"""
+        This tool allows you to execute SQL queries on the connected database.
+        The database has the following shape:
         <database>
         {ctx.deps.sql_dependency.get_prompt()}
         </database>
-        Use the available tool to query the database based on the user's instruction.
-        Explain the query you used to a non-technical user without mentioning technical details or the tool itself.
-        Then, ask if the user is satisfied with the result or wants to make further adjustments.
-        Respond in the user's language.
         IMPORTANT: {dialect_string}
-    """
+    """)
     
-@agent.tool(retries=5)
+    tool_def.description = tool_description
+    
+    return tool_def
+
+    
+    
+@agent.tool(retries=5, prepare=prepare_sql_tool)
 async def execute_sql_query(ctx: RunContext[State], query: str) -> PandasDataFrame:
     """Executes the SQL and returns the resulting table in JSON"""
 
@@ -81,25 +100,40 @@ async def execute_sql_query(ctx: RunContext[State], query: str) -> PandasDataFra
 
     return result
 
-@agent.tool(retries=5)
+async def prepare_plotly_tool(
+    ctx: RunContext[State], tool_def: ToolDefinition
+) -> ToolDefinition | None:
+    
+    if ctx.deps.sql_query_result is None:
+        return None
+    
+    tool_description = dedent(f"""
+        This tool allows you to create visualizations using Plotly.
+        
+        There is a Pandas Dataframe under the variable `df` that contains the result of the SQL query you executed earlier.
+        The Dataframe has the following columns: {'\n'.join(ctx.deps.sql_query_result.columns)}.
+        
+        DO NOT CREATE A NEW DATAFRAME OR OTHER DATA STRUCTURES.
+        Use the existing Dataframe `df` to create your visualizations.
+        
+        You have to assign the resulting figure to the variable `result`.
+        DO NOT open the figure.
+        
+        Start with the following code snippet:
+        
+        ```python
+        import plotly.express as px
+        
+        # Your code here
+    """)
+    
+    tool_def.description = tool_description
+    
+    return tool_def
+    
+
+@agent.tool(retries=5, prepare=prepare_plotly_tool)
 async def execute_plotly_code(ctx: RunContext[State], executable_python_code: str) -> PlotlyFigure:
-    """
-    Use this tool to visualize the data of the dataframe that was returned by the sql query.
-    
-    You can use the dataframe by using the variable `df`, which is already defined in the environment.
-    
-    You have to assign the resulting figure to the variable `result`.
-    DO NOT open the figure.
-    
-    Start with the following code snippet:
-    
-    ```python
-    import plotly.express as px
-    import pandas as pd
-    
-    # Your code here
-    ```
-    """
     
     environment = get_plotly_environment(ctx=ctx)
     
