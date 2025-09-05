@@ -12,7 +12,7 @@ from textwrap import dedent
 from plotly.graph_objects import Figure
 
 from state import State, SQLType
-from result import PandasDataFrame, PlotlyFigure
+from result import PandasDataFrame, PlotlyFigure, SQLQueryResult
 
 from utils import get_plotly_environment
 
@@ -94,27 +94,34 @@ async def execute_sql_query(ctx: RunContext[State], query: str) -> PandasDataFra
     if result_df.empty:
         raise ModelRetry("The resulting DataFrame is empty. You may wanna check your filters.")
     
-    result = PandasDataFrame.model_validate(result_df.to_dict(orient="split"))
+    result = SQLQueryResult(
+        query=query,
+        result=PandasDataFrame.model_validate(result_df.to_dict(orient="split"))
+    )
     
-    ctx.deps.sql_query_result = result
+    ctx.deps.sql_query_results.append(result)
 
-    return result
+    return result.result
 
 async def prepare_plotly_tool(
     ctx: RunContext[State], tool_def: ToolDefinition
 ) -> ToolDefinition | None:
     
-    if ctx.deps.sql_query_result is None:
+    if not len(ctx.deps.sql_query_results):
         return None
     
     tool_description = dedent(f"""
         This tool allows you to create visualizations using Plotly.
         
-        There is a Pandas Dataframe under the variable `df` that contains the result of the SQL query you executed earlier.
-        The Dataframe has the following columns: {'\n'.join(ctx.deps.sql_query_result.columns)}.
+        You have access to a list of Pandas dataframe which are results of SQL queries you executed earlier.
+        The list of dataframes are stores under the variable `dfs: List[pd.Dataframe]`. You can access each dataframe by its index, e.g. `dfs[0]` for the first dataframe.
+        The dataframes have the following structure:
+        <dataframes>
+        {ctx.deps.get_sql_query_results_prompt()}
+        </dataframes>
         
         DO NOT CREATE A NEW DATAFRAME OR OTHER DATA STRUCTURES.
-        Use the existing Dataframe `df` to create your visualizations.
+        Use the existing Dataframes in `dfs` to create your visualizations.
         
         You have to assign the resulting figure to the variable `result`.
         DO NOT open the figure.

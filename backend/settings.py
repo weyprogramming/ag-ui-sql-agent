@@ -4,7 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class SQLAgentSettings(BaseSettings):
 
-    OPENAI_API_KEY: str
+    OPENAI_API_KEY: str | None = None
+    ANTHROPIC_API_KEY: str | None = None
 
     DB_PASSWORD_KEY: str = Fernet.generate_key().decode()
     

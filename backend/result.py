@@ -9,6 +9,10 @@ from pydantic import BaseModel
 from pandas import DataFrame
 from plotly.graph_objects import Figure
 
+class SQLQueryResult(BaseModel):
+    query: str
+    result: PandasDataFrame
+
 class PandasDataFrame(BaseModel):
     data: List[List[Any]]
     columns: List[str]

@@ -74,7 +74,7 @@ def get_plotly_environment(ctx: RunContext[State]) -> dict:
     env = {
         "pd": import_dependency("pandas"),
         "px": import_dependency("plotly.express"),
-        "df": DataFrame(**ctx.deps.sql_query_result.model_dump()),
+        "dfs": [DataFrame(**df.result.model_dump()) for df in ctx.deps.sql_query_results],
     }
 
     return env

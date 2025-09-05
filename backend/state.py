@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from typing import List, Optional, TypedDict, Literal
+from typing import List, Optional, TypedDict
 
 from enum import StrEnum
 
@@ -24,15 +24,30 @@ from sqlalchemy import Engine, create_engine, MetaData, text
 
 from pandas import read_sql_query, DataFrame
 
-
 from settings import settings
 
-from result import PandasDataFrame, PlotlyFigure
+from result import PandasDataFrame, PlotlyFigure, SQLQueryResult
 
 class State(BaseModel):
     sql_dependency: SQLBaseDependency
-    sql_query_result: PandasDataFrame | None = None
+    sql_query_results: List[SQLQueryResult] = []
     plotly_figure_result: PlotlyFigure | None = None
+    
+    def get_sql_query_results_prompt(self) -> str:
+        
+        available_results = []
+        
+        for idx, result in enumerate(self.sql_query_results):
+            
+            current_result = {
+                "variable": f"df[{idx}]",
+                "query": result.query,
+                "columns": result.result.columns
+            }
+            
+            available_results.append(current_result)
+            
+        return json.dumps(available_results, indent=4)       
     
 class SQLType(StrEnum):
     MSSQL = "mssql"
