@@ -1,5 +1,6 @@
 "use client";
 
+import "@copilotkit/react-ui/styles.css";
 import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotChat, Markdown } from "@copilotkit/react-ui";
 
@@ -12,7 +13,7 @@ export default function CopilotKitPage() {
 
   return (
     <main>
-      <MainContent />
+      <MainContent/>
     </main>
   );
 }
@@ -43,6 +44,6 @@ const MainContent = () => {
     },
   });
   return (
-    <CopilotChat/>
+    <CopilotChat className="h-screen"/>
   )
 }
