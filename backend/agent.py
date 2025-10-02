@@ -12,7 +12,7 @@ from textwrap import dedent
 from plotly.graph_objects import Figure
 
 from state import State, SQLType
-from result import PandasDataFrame, PlotlyFigure, SQLQueryResult
+from results.tool_results import PandasDataFrame, PlotlyFigure, SQLQueryResult
 
 from utils import get_plotly_environment
 

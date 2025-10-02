@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from typing import List, Optional, TypedDict
+from typing import TypedDict, Optional, List, Self
 
 from enum import StrEnum
 
@@ -10,45 +10,16 @@ from uuid import UUID, uuid4
 
 from cryptography.fernet import Fernet
 
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, computed_field, Field, model_validator
 
-from typing_extensions import Self
+from sqlalchemy import create_engine, MetaData, text, Engine
 
-from uuid import UUID, uuid4
+from pandas import DataFrame, read_sql_query
 
-from dataclasses import dataclass
-
-from pydantic import Field, model_validator
-
-from sqlalchemy import Engine, create_engine, MetaData, text
-
-from pandas import read_sql_query, DataFrame
 
 from settings import settings
 
-from results.tool_results import PandasDataFrame, PlotlyFigure, SQLQueryResult
 
-class State(BaseModel):
-    sql_dependency: SQLBaseDependency
-    sql_query_results: List[SQLQueryResult] = []
-    plotly_figure_result: PlotlyFigure | None = None
-    
-    def get_sql_query_results_prompt(self) -> str:
-        
-        available_results = []
-        
-        for idx, result in enumerate(self.sql_query_results):
-            
-            current_result = {
-                "variable": f"df[{idx}]",
-                "query": result.query,
-                "columns": result.result.columns
-            }
-            
-            available_results.append(current_result)
-            
-        return json.dumps(available_results, indent=4)       
-    
 class SQLType(StrEnum):
     MSSQL = "mssql"
     MYSQL = "mysql"
@@ -195,7 +166,7 @@ class SQLDatabaseTable(BaseModel):
 
 class SQLBaseDependency(BaseModel):
     name: str
-    connection_params: SQLConnectionParams
+    connection_params: SQLConnectionParams | None = None
     tables: list[SQLDatabaseTable] | None = None
     table_subset: list[SQLDatabaseTable] | None = None
     column_names_to_exclude: list[str]| None = None
@@ -306,7 +277,7 @@ class SQLBaseDependency(BaseModel):
         self.tables = tables
         self.set_exclude_columns()
         
-    def get_dict(self, short: bool = False, table_subset: list[SQLDatabaseTable] | None = None, include_datasource_info: bool = False, include_table_ids: bool = False) -> dict:
+    def get_dict(self, short: bool = False, table_subset: list[SQLDatabaseTable] | None = None, include_datasource_info: bool = False, include_table_ids: bool = False) -> SQLDatasourceDict:
         
         datasource_dict: SQLDatasourceDict = {
             "datasource_type": "SQL Database",
@@ -316,7 +287,6 @@ class SQLBaseDependency(BaseModel):
         
         if include_datasource_info:
             datasource_dict["name"] = self.name
-            datasource_dict["id"] = str(self.id)
         
         if table_subset is None:
             

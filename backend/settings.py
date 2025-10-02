@@ -6,6 +6,9 @@ class SQLAgentSettings(BaseSettings):
 
     OPENAI_API_KEY: str | None = None
     ANTHROPIC_API_KEY: str | None = None
+    
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
 
     DB_PASSWORD_KEY: str = Fernet.generate_key().decode()
     
