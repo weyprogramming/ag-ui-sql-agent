@@ -36,3 +36,5 @@ class DashboardSQLQueryParameter(BaseModel):
     example_value: str | int | float | date | bool | datetime | time = Field(
         description="An example value for the parameter, e.g. 'example' for a str parameter"
     )
+    
+DashboardConfig.model_rebuild()

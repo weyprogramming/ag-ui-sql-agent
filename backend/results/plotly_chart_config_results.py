@@ -7,7 +7,7 @@ from plotly.express import bar, line, scatter, box, pie, histogram
 from results.tool_results import PlotlyFigure
 
 
-class PlotlyChartConfigBase(ABC, BaseModel):
+class PlotlyChartConfigBase(BaseModel):
     
     @abstractmethod
     def get_figure(self, dataframe) -> PlotlyFigure:

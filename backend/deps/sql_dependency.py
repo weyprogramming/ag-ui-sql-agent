@@ -20,7 +20,7 @@ from pandas import DataFrame, read_sql_query
 from settings import settings
 from results.dashboard_config_results import DashboardSQLQuery
 from results.tool_results import PandasDataFrame
-
+from schemas.dashboard_evaluation import DashboardEvaluationRequest, DashboardEvaluationSQLQuery, DashboardEvaluationResult
 
 class SQLType(StrEnum):
     MSSQL = "mssql"
@@ -372,3 +372,37 @@ class SQLBaseDependency(BaseModel):
         df = self.get_dataframe_from_query(query)
         
         return PandasDataFrame.model_validate(df.to_dict(orient="split"))
+    
+    def execute_dashboard_evaluation_sql_query(
+        self,
+        dashboard_evaluation_sql_query: DashboardEvaluationSQLQuery
+    ) -> PandasDataFrame:
+        
+        query = dashboard_evaluation_sql_query.parametrized_query
+        
+        for parameter in dashboard_evaluation_sql_query.dashboard_sql_query_parameter_values:
+            
+            query = query.replace(
+                "{" + repr(parameter.parameter_config.name) + "}",
+                parameter.value
+            )
+            
+        df = self.get_dataframe_from_query(query=query)
+        
+        return PandasDataFrame.from_dataframe(df=df)
+    
+    def execute_dashboard_evaluation(
+        self,
+        dashboard_evaluation_request: DashboardEvaluationRequest
+    ) -> DashboardEvaluationResult:
+        
+        dataframe = self.execute_dashboard_evaluation_sql_query(
+            dashboard_evaluation_sql_query=dashboard_evaluation_request.dashboard_evaluation_sql_query
+        )
+        
+        chart = dashboard_evaluation_request.chart_config.get_figure(dataframe=dataframe)
+        
+        return DashboardEvaluationResult(
+            data_frame=dataframe,
+            figure=chart
+        )

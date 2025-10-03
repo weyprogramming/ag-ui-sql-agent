@@ -13,30 +13,14 @@ from pydantic_ai.ag_ui import handle_ag_ui_request, StateDeps
 from dotenv import load_dotenv
 load_dotenv()
 
-from deps.sql_dependency import SQLBaseDependency, SQLConnectionParams, SQLType
+from deps.current_sql_dep import current_sql_dep
 from states.dashboard_state import State, DashboardState
 from models.dashboard_config_models import DashboardConfigModel
 from settings import settings
 from agents.dashboard_agent import dashboard_agent
-from api.dashboard import router as dashboard_router
+from api.dashboard_config import router as dashboard_router
 from api.agent_state import agent_state_router
-
-sql_connection_params = SQLConnectionParams(
-    type=SQLType.MSSQL,
-    host="localhost",
-    port=1433,
-    database="German",
-    username="sa",
-    encrypted_password=Fernet(settings.DB_PASSWORD_KEY.encode()).encrypt("Administrator0803".encode())
-)
-
-sql_dep = SQLBaseDependency(
-    name="Tradedatabase",
-    connection_params=sql_connection_params,
-)
-
-metadata = sql_dep.get_metadata()
-sql_dep.set_tables_from_metadata(metadata)
+from api.dashboard_evaluation import dashboard_evaluation_router
 
 redis_url = f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}"
 
@@ -52,11 +36,12 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(agent_state_router, prefix="/api")
+app.include_router(dashboard_evaluation_router, prefix="/api")
 
 @app.post("/")
 async def run_agent(request: Request) -> Response:
     
-    deps = State(sql_dependency=sql_dep, state=DashboardState())
+    deps = State(sql_dependency=current_sql_dep, state=DashboardState())
     
     return await handle_ag_ui_request(
         agent=dashboard_agent, 
