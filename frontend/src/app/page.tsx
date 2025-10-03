@@ -13,9 +13,11 @@ export default function CopilotKitPage() {
 }
 
 const MainContent = () => {
-  return(<div>
-    <DashboardState/>
-    <Chat/>
+  return(<div className="flex">
+    <div className="flex-1">
+      <DashboardState/>
+      <Chat/>
+    </div>
   </div> 
   )
 }

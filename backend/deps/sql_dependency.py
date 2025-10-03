@@ -18,6 +18,8 @@ from pandas import DataFrame, read_sql_query
 
 
 from settings import settings
+from results.dashboard_config_results import DashboardSQLQuery
+from results.tool_results import PandasDataFrame
 
 
 class SQLType(StrEnum):
@@ -354,3 +356,19 @@ class SQLBaseDependency(BaseModel):
                     return column
                 
         return None
+    
+    
+    def test_dashboard_sql_query(self, dashboard_sql_query: DashboardSQLQuery) -> PandasDataFrame:
+        
+        query = dashboard_sql_query.parametrized_query
+        
+        for parameter in dashboard_sql_query.dashboard_sql_query_parameters:
+            
+            query = query.replace(
+                "{" + parameter.name + "}",
+                repr(parameter.example_value)
+            )
+            
+        df = self.get_dataframe_from_query(query)
+        
+        return PandasDataFrame.model_validate(df.to_dict(orient="split"))

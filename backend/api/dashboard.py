@@ -24,4 +24,3 @@ async def get_dashboards() -> List[DashboardConfigModel]:
         dashboard_configs.append(dashboard_config)
         
     return dashboard_configs
-

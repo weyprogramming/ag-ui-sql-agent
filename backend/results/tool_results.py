@@ -36,3 +36,6 @@ class PlotlyFigure(BaseModel):
         return cls(
             **json.loads(fig.to_json())
         )
+        
+    
+    

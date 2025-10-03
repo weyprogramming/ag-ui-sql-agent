@@ -1,6 +1,6 @@
 export default function PandasDataFrame({ data, columns, index }: { data: any[][], columns: string[], index?: any[] }) {
   return (
-    <div className="overflow-x-auto shadow-lg rounded-lg pt-5">
+    <div className="overflow-x-auto rounded-lg max-h-[80vh] overflow-y-auto">
       <table className="min-w-full bg-white border border-gray-200">
         <thead className="bg-gray-50">
           <tr>

@@ -65,22 +65,44 @@ export interface components {
             /** Title */
             title: string;
             dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
+            dashboard_chart: components["schemas"]["DashboardPlotlyChartConfig"];
         };
         /** DashboardConfig */
         "DashboardConfig-Output": {
             /** Title */
             title: string;
             dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
+            dashboard_chart: components["schemas"]["DashboardPlotlyChartConfig"];
         };
         /** DashboardConfigModel */
         DashboardConfigModel: {
             /** Title */
             title: string;
             dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
+            dashboard_chart: components["schemas"]["DashboardPlotlyChartConfig"];
             /** Pk */
             pk?: string | null;
         } & {
             [key: string]: unknown;
+        };
+        /** DashboardPlotlyChartConfig */
+        DashboardPlotlyChartConfig: {
+            /**
+             * Type
+             * @description The type of the plotly chart, e.g. 'bar', 'line', 'scatter', etc.
+             * @enum {string}
+             */
+            type: "bar" | "barpolar" | "box" | "candlestick" | "carpet" | "choropleth" | "choroplethmap" | "choroplethmapbox" | "cone" | "contour" | "contourcarpet" | "densitymap" | "densitymapbox" | "funnel" | "funnelarea" | "heatmap" | "histogram" | "histogram2d" | "histogram2dcontour" | "icicle" | "image" | "indicator" | "isosurface" | "mesh3d" | "ohlc" | "parcats" | "parcoords" | "pie" | "sankey" | "scatter" | "scatter3d" | "scattercarpet" | "scattergeo" | "scattergl" | "scattermap" | "scattermapbox" | "scatterpolar" | "scatterpolargl" | "scattersmith" | "scatterternary" | "splom" | "streamtube" | "sunburst" | "surface" | "table" | "treemap" | "violin" | "volume" | "waterfall";
+            /**
+             * X
+             * @description The column name to use for the x-axis
+             */
+            x: string;
+            /**
+             * Y
+             * @description The column name(s) to use for the y-axis
+             */
+            y: string | string[];
         };
         /** DashboardSQLQuery */
         DashboardSQLQuery: {
@@ -97,129 +119,58 @@ export interface components {
         };
         /** DashboardSQLQueryParameter */
         DashboardSQLQueryParameter: {
-            /** Name */
+            /**
+             * Name
+             * @description The name of the parameter, e.g. 'parameter' for {parameter}
+             */
             name: string;
             /**
              * Type
+             * @description The type of the parameter, e.g. 'str', 'int', 'float', 'date', 'bool', 'datetime', or 'time'
              * @enum {string}
              */
-            type: "string" | "int" | "float" | "date" | "boolean";
+            type: "str" | "int" | "float" | "date" | "bool" | "datetime" | "time";
+            /**
+             * Example Value
+             * @description An example value for the parameter, e.g. 'example' for a str parameter
+             */
+            example_value: string | number | boolean;
         };
         /** DashboardState */
         DashboardState: {
-            sql_dependency: components["schemas"]["SQLBaseDependency"];
             dashboard_config?: components["schemas"]["DashboardConfig-Output"] | null;
+            test_dateframe?: components["schemas"]["PandasDataFrame"] | null;
+            test_figure?: components["schemas"]["PlotlyFigure"] | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
-        /** SQLBaseDependency */
-        SQLBaseDependency: {
-            /** Name */
-            name: string;
-            connection_params: components["schemas"]["SQLConnectionParams"];
-            /** Tables */
-            tables?: components["schemas"]["SQLDatabaseTable"][] | null;
-            /** Table Subset */
-            table_subset?: components["schemas"]["SQLDatabaseTable"][] | null;
-            /** Column Names To Exclude */
-            column_names_to_exclude?: string[] | null;
+        /** PandasDataFrame */
+        PandasDataFrame: {
+            /** Data */
+            data: unknown[][];
+            /** Columns */
+            columns: string[];
+            /** Index */
+            index?: unknown[] | null;
         };
-        /** SQLConnectionParams */
-        SQLConnectionParams: {
-            type: components["schemas"]["SQLType"];
-            /** Host */
-            host: string;
-            /** Port */
-            port: number;
-            /** Username */
-            username: string;
-            /**
-             * Encrypted Password
-             * Format: binary
-             */
-            encrypted_password: string;
-            /** Database */
-            database: string;
-            /** Password */
-            readonly password: string;
+        /** PlotlyFigure */
+        PlotlyFigure: {
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            }[];
+            /** Layout */
+            layout?: {
+                [key: string]: unknown;
+            } | null;
+            /** Config */
+            config?: {
+                [key: string]: unknown;
+            } | null;
         };
-        /** SQLDatabaseTable */
-        SQLDatabaseTable: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id?: string;
-            /** Table Name */
-            table_name: string;
-            /** Description */
-            description: string | null;
-            /** Comment */
-            comment: string | null;
-            /**
-             * Columns
-             * @default []
-             */
-            columns: components["schemas"]["SQLTableColumn"][];
-        };
-        /** SQLJoin */
-        SQLJoin: {
-            /** Table */
-            table: string;
-            /**
-             * Table Id
-             * Format: uuid
-             */
-            table_id: string;
-            /** Column Key */
-            column_key: string;
-            /**
-             * Column Id
-             * Format: uuid
-             */
-            column_id: string;
-        };
-        /** SQLTableColumn */
-        SQLTableColumn: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id?: string;
-            /**
-             * Table Id
-             * Format: uuid
-             */
-            table_id: string;
-            /**
-             * Exclude
-             * @default false
-             */
-            exclude: boolean;
-            /** Name */
-            name: string;
-            /** Key */
-            key: string;
-            /** Type */
-            type?: string | null;
-            /** Nullable */
-            nullable?: boolean | null;
-            /** Primary Key */
-            primary_key?: boolean | null;
-            /** Unique */
-            unique?: boolean | null;
-            /** Comment */
-            comment?: string | null;
-            join?: components["schemas"]["SQLJoin"] | null;
-        };
-        /**
-         * SQLType
-         * @enum {string}
-         */
-        SQLType: "mssql" | "mysql" | "postgres" | "sqlite";
         /** ValidationError */
         ValidationError: {
             /** Location */

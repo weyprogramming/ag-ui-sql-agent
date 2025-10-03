@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from deps.sql_dependency import SQLBaseDependency, SQLConnectionParams, SQLType
-from states.dashboard_state import DashboardState
+from states.dashboard_state import State, DashboardState
 from models.dashboard_config_models import DashboardConfigModel
 from settings import settings
 from agents.dashboard_agent import dashboard_agent
@@ -56,7 +56,7 @@ app.include_router(agent_state_router, prefix="/api")
 @app.post("/")
 async def run_agent(request: Request) -> Response:
     
-    deps = DashboardState(sql_dependency=sql_dep)
+    deps = State(sql_dependency=sql_dep, state=DashboardState())
     
     return await handle_ag_ui_request(
         agent=dashboard_agent, 
