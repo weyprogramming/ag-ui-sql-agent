@@ -15,7 +15,7 @@ from states.dashboard_state import State, DashboardState
 from results.dashboard_config_results import DashboardConfig
 from results.tool_results import PandasDataFrame
 
-dashboard_agent = Agent(deps_type=StateDeps[State], model="openai:gpt-5-nano")
+dashboard_agent = Agent(deps_type=StateDeps[State], model="anthropic:claude-sonnet-4-0")
 
 @dashboard_agent.instructions
 def dashboard_instructions(ctx: RunContext[State]) -> str:
@@ -59,14 +59,11 @@ async def execute_sql_query(
 
                 
         
-    except asyncio.TimeoutError:
-        raise ModelRetry("SQL query execution timed out after 10 seconds")
-    
-    except Exception as e:
-        raise ModelRetry(f"Error while executing SQL query: {str(e)}")
-    
-    if result_df.empty:
-        raise ModelRetry("The resulting DataFrame is empty. You may wanna check your filters.")
+    except asyncio.TimeoutError as exc:
+        raise ModelRetry("SQL query execution timed out after 10 seconds") from exc
+
+    except Exception as exc:
+        raise ModelRetry(f"Error while executing SQL query: {exc}") from exc
     
     return result
 

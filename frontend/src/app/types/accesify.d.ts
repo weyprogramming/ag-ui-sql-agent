@@ -39,6 +39,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dashboard-evaluation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Evaluate Dashboard */
+        post: operations["evaluate_dashboard_api_dashboard_evaluation_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -60,49 +77,444 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** BarChartConfig */
+        BarChartConfig: {
+            /**
+             * X
+             * @description The column name(s) to use for the x-axis
+             */
+            x?: string | string[] | null;
+            /**
+             * Y
+             * @description The column name(s) to use for the y-axis
+             */
+            y?: string | string[] | null;
+            /**
+             * Color
+             * @description Column name for color encoding
+             */
+            color?: string | null;
+            /**
+             * Pattern Shape
+             * @description Column name for pattern shape encoding
+             */
+            pattern_shape?: string | null;
+            /**
+             * Facet Row
+             * @description Column name for facet rows
+             */
+            facet_row?: string | null;
+            /**
+             * Facet Col
+             * @description Column name for facet columns
+             */
+            facet_col?: string | null;
+            /**
+             * Facet Col Wrap
+             * @description Maximum number of facet columns
+             * @default 0
+             */
+            facet_col_wrap: number;
+            /**
+             * Facet Row Spacing
+             * @description Spacing between facet rows
+             */
+            facet_row_spacing?: number | null;
+            /**
+             * Facet Col Spacing
+             * @description Spacing between facet columns
+             */
+            facet_col_spacing?: number | null;
+            /**
+             * Hover Name
+             * @description Column name for hover name
+             */
+            hover_name?: string | null;
+            /**
+             * Hover Data
+             * @description Columns to show in hover tooltip
+             */
+            hover_data?: string[] | {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Custom Data
+             * @description Custom data columns
+             */
+            custom_data?: string[] | null;
+            /**
+             * Text
+             * @description Column name for text labels
+             */
+            text?: string | null;
+            /**
+             * Base
+             * @description Column name for base values
+             */
+            base?: string | null;
+            /**
+             * Error X
+             * @description Column name for x error bars
+             */
+            error_x?: string | null;
+            /**
+             * Error X Minus
+             * @description Column name for x error bars (minus)
+             */
+            error_x_minus?: string | null;
+            /**
+             * Error Y
+             * @description Column name for y error bars
+             */
+            error_y?: string | null;
+            /**
+             * Error Y Minus
+             * @description Column name for y error bars (minus)
+             */
+            error_y_minus?: string | null;
+            /**
+             * Animation Frame
+             * @description Column name for animation frames
+             */
+            animation_frame?: string | null;
+            /**
+             * Animation Group
+             * @description Column name for animation groups
+             */
+            animation_group?: string | null;
+            /**
+             * Category Orders
+             * @description Dictionary of category orders
+             */
+            category_orders?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Labels
+             * @description Dictionary of axis labels
+             */
+            labels?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Color Discrete Sequence
+             * @description Sequence of discrete colors
+             */
+            color_discrete_sequence?: string[] | null;
+            /**
+             * Color Discrete Map
+             * @description Mapping of values to colors
+             */
+            color_discrete_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Color Continuous Scale
+             * @description Continuous color scale
+             */
+            color_continuous_scale?: unknown[] | string | null;
+            /**
+             * Pattern Shape Sequence
+             * @description Sequence of pattern shapes
+             */
+            pattern_shape_sequence?: string[] | null;
+            /**
+             * Pattern Shape Map
+             * @description Mapping of values to pattern shapes
+             */
+            pattern_shape_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Range Color
+             * @description Range of color scale
+             */
+            range_color?: unknown[] | null;
+            /**
+             * Color Continuous Midpoint
+             * @description Midpoint of color scale
+             */
+            color_continuous_midpoint?: number | null;
+            /**
+             * Opacity
+             * @description Opacity of bars
+             */
+            opacity?: number | null;
+            /**
+             * Orientation
+             * @description Orientation ('v' or 'h')
+             */
+            orientation?: string | null;
+            /**
+             * Barmode
+             * @description Bar mode ('relative', 'group', 'overlay', 'stack')
+             * @default relative
+             */
+            barmode: string;
+            /**
+             * Log X
+             * @description Use log scale for x-axis
+             * @default false
+             */
+            log_x: boolean;
+            /**
+             * Log Y
+             * @description Use log scale for y-axis
+             * @default false
+             */
+            log_y: boolean;
+            /**
+             * Range X
+             * @description Range for x-axis
+             */
+            range_x?: unknown[] | null;
+            /**
+             * Range Y
+             * @description Range for y-axis
+             */
+            range_y?: unknown[] | null;
+            /**
+             * Text Auto
+             * @description Automatic text labels
+             * @default false
+             */
+            text_auto: boolean | string;
+            /**
+             * Title
+             * @description Chart title
+             */
+            title?: string | null;
+            /**
+             * Subtitle
+             * @description Chart subtitle
+             */
+            subtitle?: string | null;
+            /**
+             * Template
+             * @description Plotly template
+             */
+            template?: string | null;
+            /**
+             * Width
+             * @description Chart width in pixels
+             */
+            width?: number | null;
+            /**
+             * Height
+             * @description Chart height in pixels
+             */
+            height?: number | null;
+        };
+        /** BoxChartConfig */
+        BoxChartConfig: {
+            /**
+             * X
+             * @description The column name to use for the x-axis
+             */
+            x?: string | null;
+            /**
+             * Y
+             * @description The column name to use for the y-axis
+             */
+            y?: string | null;
+            /**
+             * Color
+             * @description Column name for color encoding
+             */
+            color?: string | null;
+            /**
+             * Facet Row
+             * @description Column name for facet rows
+             */
+            facet_row?: string | null;
+            /**
+             * Facet Col
+             * @description Column name for facet columns
+             */
+            facet_col?: string | null;
+            /**
+             * Facet Col Wrap
+             * @description Maximum number of facet columns
+             * @default 0
+             */
+            facet_col_wrap: number;
+            /**
+             * Facet Row Spacing
+             * @description Spacing between facet rows
+             */
+            facet_row_spacing?: number | null;
+            /**
+             * Facet Col Spacing
+             * @description Spacing between facet columns
+             */
+            facet_col_spacing?: number | null;
+            /**
+             * Hover Name
+             * @description Column name for hover name
+             */
+            hover_name?: string | null;
+            /**
+             * Hover Data
+             * @description Columns to show in hover tooltip
+             */
+            hover_data?: string[] | {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Custom Data
+             * @description Custom data columns
+             */
+            custom_data?: string[] | null;
+            /**
+             * Animation Frame
+             * @description Column name for animation frames
+             */
+            animation_frame?: string | null;
+            /**
+             * Animation Group
+             * @description Column name for animation groups
+             */
+            animation_group?: string | null;
+            /**
+             * Category Orders
+             * @description Dictionary of category orders
+             */
+            category_orders?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Labels
+             * @description Dictionary of axis labels
+             */
+            labels?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Color Discrete Sequence
+             * @description Sequence of discrete colors
+             */
+            color_discrete_sequence?: string[] | null;
+            /**
+             * Color Discrete Map
+             * @description Mapping of values to colors
+             */
+            color_discrete_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Orientation
+             * @description Orientation ('v' or 'h')
+             */
+            orientation?: string | null;
+            /**
+             * Boxmode
+             * @description Box mode ('group' or 'overlay')
+             */
+            boxmode?: string | null;
+            /**
+             * Log X
+             * @description Use log scale for x-axis
+             * @default false
+             */
+            log_x: boolean;
+            /**
+             * Log Y
+             * @description Use log scale for y-axis
+             * @default false
+             */
+            log_y: boolean;
+            /**
+             * Range X
+             * @description Range for x-axis
+             */
+            range_x?: unknown[] | null;
+            /**
+             * Range Y
+             * @description Range for y-axis
+             */
+            range_y?: unknown[] | null;
+            /**
+             * Points
+             * @description Show points ('all', 'outliers', 'suspectedoutliers', False)
+             */
+            points?: string | null;
+            /**
+             * Notched
+             * @description Show notched boxes
+             * @default false
+             */
+            notched: boolean;
+            /**
+             * Title
+             * @description Chart title
+             */
+            title?: string | null;
+            /**
+             * Subtitle
+             * @description Chart subtitle
+             */
+            subtitle?: string | null;
+            /**
+             * Template
+             * @description Plotly template
+             */
+            template?: string | null;
+            /**
+             * Width
+             * @description Chart width in pixels
+             */
+            width?: number | null;
+            /**
+             * Height
+             * @description Chart height in pixels
+             */
+            height?: number | null;
+        };
         /** DashboardConfig */
         "DashboardConfig-Input": {
             /** Title */
             title: string;
             dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
-            dashboard_chart: components["schemas"]["DashboardPlotlyChartConfig"];
+            /** Chart Config */
+            chart_config: components["schemas"]["BarChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BoxChartConfig"];
         };
         /** DashboardConfig */
         "DashboardConfig-Output": {
             /** Title */
             title: string;
             dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
-            dashboard_chart: components["schemas"]["DashboardPlotlyChartConfig"];
+            /** Chart Config */
+            chart_config: components["schemas"]["BarChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BoxChartConfig"];
         };
         /** DashboardConfigModel */
         DashboardConfigModel: {
             /** Title */
             title: string;
             dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
-            dashboard_chart: components["schemas"]["DashboardPlotlyChartConfig"];
+            /** Chart Config */
+            chart_config: components["schemas"]["BarChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BoxChartConfig"];
             /** Pk */
             pk?: string | null;
         } & {
             [key: string]: unknown;
         };
-        /** DashboardPlotlyChartConfig */
-        DashboardPlotlyChartConfig: {
-            /**
-             * Type
-             * @description The type of the plotly chart, e.g. 'bar', 'line', 'scatter', etc.
-             * @enum {string}
-             */
-            type: "bar" | "barpolar" | "box" | "candlestick" | "carpet" | "choropleth" | "choroplethmap" | "choroplethmapbox" | "cone" | "contour" | "contourcarpet" | "densitymap" | "densitymapbox" | "funnel" | "funnelarea" | "heatmap" | "histogram" | "histogram2d" | "histogram2dcontour" | "icicle" | "image" | "indicator" | "isosurface" | "mesh3d" | "ohlc" | "parcats" | "parcoords" | "pie" | "sankey" | "scatter" | "scatter3d" | "scattercarpet" | "scattergeo" | "scattergl" | "scattermap" | "scattermapbox" | "scatterpolar" | "scatterpolargl" | "scattersmith" | "scatterternary" | "splom" | "streamtube" | "sunburst" | "surface" | "table" | "treemap" | "violin" | "volume" | "waterfall";
-            /**
-             * X
-             * @description The column name to use for the x-axis
-             */
-            x: string;
-            /**
-             * Y
-             * @description The column name(s) to use for the y-axis
-             */
-            y: string | string[];
+        /** DashboardEvaluationRequest */
+        DashboardEvaluationRequest: {
+            dashboard_evaluation_sql_query: components["schemas"]["DashboardEvaluationSQLQuery"];
+            /** Chart Config */
+            chart_config: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"];
+        };
+        /** DashboardEvaluationResult */
+        DashboardEvaluationResult: {
+            data_frame: components["schemas"]["PandasDataFrame"];
+            figure: components["schemas"]["PlotlyFigure"];
+        };
+        /** DashboardEvaluationSQLQuery */
+        DashboardEvaluationSQLQuery: {
+            /** Parametrized Query */
+            parametrized_query: string;
+            /** Dashboard Sql Query Parameter Values */
+            dashboard_sql_query_parameter_values: components["schemas"]["DashboardSQLQueryParameterValue"][];
         };
         /** DashboardSQLQuery */
         DashboardSQLQuery: {
@@ -136,6 +548,12 @@ export interface components {
              */
             example_value: string | number | boolean;
         };
+        /** DashboardSQLQueryParameterValue */
+        DashboardSQLQueryParameterValue: {
+            parameter_config: components["schemas"]["DashboardSQLQueryParameter"];
+            /** Value */
+            value: string | number | boolean;
+        };
         /** DashboardState */
         DashboardState: {
             dashboard_config?: components["schemas"]["DashboardConfig-Output"] | null;
@@ -147,6 +565,444 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HistogramChartConfig */
+        HistogramChartConfig: {
+            /**
+             * X
+             * @description The column name to use for the x-axis
+             */
+            x?: string | null;
+            /**
+             * Y
+             * @description The column name to use for the y-axis
+             */
+            y?: string | null;
+            /**
+             * Color
+             * @description Column name for color encoding
+             */
+            color?: string | null;
+            /**
+             * Pattern Shape
+             * @description Column name for pattern shape encoding
+             */
+            pattern_shape?: string | null;
+            /**
+             * Facet Row
+             * @description Column name for facet rows
+             */
+            facet_row?: string | null;
+            /**
+             * Facet Col
+             * @description Column name for facet columns
+             */
+            facet_col?: string | null;
+            /**
+             * Facet Col Wrap
+             * @description Maximum number of facet columns
+             * @default 0
+             */
+            facet_col_wrap: number;
+            /**
+             * Facet Row Spacing
+             * @description Spacing between facet rows
+             */
+            facet_row_spacing?: number | null;
+            /**
+             * Facet Col Spacing
+             * @description Spacing between facet columns
+             */
+            facet_col_spacing?: number | null;
+            /**
+             * Hover Name
+             * @description Column name for hover name
+             */
+            hover_name?: string | null;
+            /**
+             * Hover Data
+             * @description Columns to show in hover tooltip
+             */
+            hover_data?: string[] | {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Animation Frame
+             * @description Column name for animation frames
+             */
+            animation_frame?: string | null;
+            /**
+             * Animation Group
+             * @description Column name for animation groups
+             */
+            animation_group?: string | null;
+            /**
+             * Category Orders
+             * @description Dictionary of category orders
+             */
+            category_orders?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Labels
+             * @description Dictionary of axis labels
+             */
+            labels?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Color Discrete Sequence
+             * @description Sequence of discrete colors
+             */
+            color_discrete_sequence?: string[] | null;
+            /**
+             * Color Discrete Map
+             * @description Mapping of values to colors
+             */
+            color_discrete_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Pattern Shape Sequence
+             * @description Sequence of pattern shapes
+             */
+            pattern_shape_sequence?: string[] | null;
+            /**
+             * Pattern Shape Map
+             * @description Mapping of values to pattern shapes
+             */
+            pattern_shape_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Marginal
+             * @description Marginal plot type ('rug', 'box', 'violin', 'histogram')
+             */
+            marginal?: string | null;
+            /**
+             * Opacity
+             * @description Opacity of bars
+             */
+            opacity?: number | null;
+            /**
+             * Orientation
+             * @description Orientation ('v' or 'h')
+             */
+            orientation?: string | null;
+            /**
+             * Barmode
+             * @description Bar mode ('relative', 'group', 'overlay', 'stack')
+             * @default relative
+             */
+            barmode: string;
+            /**
+             * Barnorm
+             * @description Bar normalization ('fraction', 'percent')
+             */
+            barnorm?: string | null;
+            /**
+             * Histnorm
+             * @description Histogram normalization
+             */
+            histnorm?: string | null;
+            /**
+             * Log X
+             * @description Use log scale for x-axis
+             * @default false
+             */
+            log_x: boolean;
+            /**
+             * Log Y
+             * @description Use log scale for y-axis
+             * @default false
+             */
+            log_y: boolean;
+            /**
+             * Range X
+             * @description Range for x-axis
+             */
+            range_x?: unknown[] | null;
+            /**
+             * Range Y
+             * @description Range for y-axis
+             */
+            range_y?: unknown[] | null;
+            /**
+             * Histfunc
+             * @description Histogram function ('count', 'sum', 'avg', etc.)
+             */
+            histfunc?: string | null;
+            /**
+             * Cumulative
+             * @description Show cumulative histogram
+             */
+            cumulative?: boolean | null;
+            /**
+             * Nbins
+             * @description Number of bins
+             */
+            nbins?: number | null;
+            /**
+             * Text Auto
+             * @description Automatic text labels
+             * @default false
+             */
+            text_auto: boolean | string;
+            /**
+             * Title
+             * @description Chart title
+             */
+            title?: string | null;
+            /**
+             * Subtitle
+             * @description Chart subtitle
+             */
+            subtitle?: string | null;
+            /**
+             * Template
+             * @description Plotly template
+             */
+            template?: string | null;
+            /**
+             * Width
+             * @description Chart width in pixels
+             */
+            width?: number | null;
+            /**
+             * Height
+             * @description Chart height in pixels
+             */
+            height?: number | null;
+        };
+        /** LineChartConfig */
+        LineChartConfig: {
+            /**
+             * X
+             * @description The column name(s) to use for the x-axis
+             */
+            x?: string | string[] | null;
+            /**
+             * Y
+             * @description The column name(s) to use for the y-axis
+             */
+            y?: string | string[] | null;
+            /**
+             * Line Group
+             * @description Column name for line grouping
+             */
+            line_group?: string | null;
+            /**
+             * Color
+             * @description Column name for color encoding
+             */
+            color?: string | null;
+            /**
+             * Line Dash
+             * @description Column name for line dash encoding
+             */
+            line_dash?: string | null;
+            /**
+             * Symbol
+             * @description Column name for symbol encoding
+             */
+            symbol?: string | null;
+            /**
+             * Hover Name
+             * @description Column name for hover name
+             */
+            hover_name?: string | null;
+            /**
+             * Hover Data
+             * @description Columns to show in hover tooltip
+             */
+            hover_data?: string[] | {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Custom Data
+             * @description Custom data columns
+             */
+            custom_data?: string[] | null;
+            /**
+             * Text
+             * @description Column name for text labels
+             */
+            text?: string | null;
+            /**
+             * Facet Row
+             * @description Column name for facet rows
+             */
+            facet_row?: string | null;
+            /**
+             * Facet Col
+             * @description Column name for facet columns
+             */
+            facet_col?: string | null;
+            /**
+             * Facet Col Wrap
+             * @description Maximum number of facet columns
+             * @default 0
+             */
+            facet_col_wrap: number;
+            /**
+             * Facet Row Spacing
+             * @description Spacing between facet rows
+             */
+            facet_row_spacing?: number | null;
+            /**
+             * Facet Col Spacing
+             * @description Spacing between facet columns
+             */
+            facet_col_spacing?: number | null;
+            /**
+             * Error X
+             * @description Column name for x error bars
+             */
+            error_x?: string | null;
+            /**
+             * Error X Minus
+             * @description Column name for x error bars (minus)
+             */
+            error_x_minus?: string | null;
+            /**
+             * Error Y
+             * @description Column name for y error bars
+             */
+            error_y?: string | null;
+            /**
+             * Error Y Minus
+             * @description Column name for y error bars (minus)
+             */
+            error_y_minus?: string | null;
+            /**
+             * Animation Frame
+             * @description Column name for animation frames
+             */
+            animation_frame?: string | null;
+            /**
+             * Animation Group
+             * @description Column name for animation groups
+             */
+            animation_group?: string | null;
+            /**
+             * Category Orders
+             * @description Dictionary of category orders
+             */
+            category_orders?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Labels
+             * @description Dictionary of axis labels
+             */
+            labels?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Orientation
+             * @description Orientation ('v' or 'h')
+             */
+            orientation?: string | null;
+            /**
+             * Color Discrete Sequence
+             * @description Sequence of discrete colors
+             */
+            color_discrete_sequence?: string[] | null;
+            /**
+             * Color Discrete Map
+             * @description Mapping of values to colors
+             */
+            color_discrete_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Line Dash Sequence
+             * @description Sequence of line dash patterns
+             */
+            line_dash_sequence?: string[] | null;
+            /**
+             * Line Dash Map
+             * @description Mapping of values to line dash patterns
+             */
+            line_dash_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Symbol Sequence
+             * @description Sequence of symbols
+             */
+            symbol_sequence?: string[] | null;
+            /**
+             * Symbol Map
+             * @description Mapping of values to symbols
+             */
+            symbol_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Markers
+             * @description Show markers on lines
+             * @default false
+             */
+            markers: boolean;
+            /**
+             * Log X
+             * @description Use log scale for x-axis
+             * @default false
+             */
+            log_x: boolean;
+            /**
+             * Log Y
+             * @description Use log scale for y-axis
+             * @default false
+             */
+            log_y: boolean;
+            /**
+             * Range X
+             * @description Range for x-axis
+             */
+            range_x?: unknown[] | null;
+            /**
+             * Range Y
+             * @description Range for y-axis
+             */
+            range_y?: unknown[] | null;
+            /**
+             * Line Shape
+             * @description Line shape ('linear', 'spline', etc.)
+             */
+            line_shape?: string | null;
+            /**
+             * Render Mode
+             * @description Render mode
+             * @default auto
+             */
+            render_mode: string;
+            /**
+             * Title
+             * @description Chart title
+             */
+            title?: string | null;
+            /**
+             * Subtitle
+             * @description Chart subtitle
+             */
+            subtitle?: string | null;
+            /**
+             * Template
+             * @description Plotly template
+             */
+            template?: string | null;
+            /**
+             * Width
+             * @description Chart width in pixels
+             */
+            width?: number | null;
+            /**
+             * Height
+             * @description Chart height in pixels
+             */
+            height?: number | null;
+        };
         /** PandasDataFrame */
         PandasDataFrame: {
             /** Data */
@@ -155,6 +1011,128 @@ export interface components {
             columns: string[];
             /** Index */
             index?: unknown[] | null;
+        };
+        /** PieChartConfig */
+        PieChartConfig: {
+            /**
+             * Names
+             * @description Column name for sector names
+             */
+            names?: string | null;
+            /**
+             * Values
+             * @description Column name for sector values
+             */
+            values?: string | null;
+            /**
+             * Color
+             * @description Column name for color encoding
+             */
+            color?: string | null;
+            /**
+             * Facet Row
+             * @description Column name for facet rows
+             */
+            facet_row?: string | null;
+            /**
+             * Facet Col
+             * @description Column name for facet columns
+             */
+            facet_col?: string | null;
+            /**
+             * Facet Col Wrap
+             * @description Maximum number of facet columns
+             * @default 0
+             */
+            facet_col_wrap: number;
+            /**
+             * Facet Row Spacing
+             * @description Spacing between facet rows
+             */
+            facet_row_spacing?: number | null;
+            /**
+             * Facet Col Spacing
+             * @description Spacing between facet columns
+             */
+            facet_col_spacing?: number | null;
+            /**
+             * Color Discrete Sequence
+             * @description Sequence of discrete colors
+             */
+            color_discrete_sequence?: string[] | null;
+            /**
+             * Color Discrete Map
+             * @description Mapping of values to colors
+             */
+            color_discrete_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Hover Name
+             * @description Column name for hover name
+             */
+            hover_name?: string | null;
+            /**
+             * Hover Data
+             * @description Columns to show in hover tooltip
+             */
+            hover_data?: string[] | {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Custom Data
+             * @description Custom data columns
+             */
+            custom_data?: string[] | null;
+            /**
+             * Category Orders
+             * @description Dictionary of category orders
+             */
+            category_orders?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Labels
+             * @description Dictionary of labels
+             */
+            labels?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Title
+             * @description Chart title
+             */
+            title?: string | null;
+            /**
+             * Subtitle
+             * @description Chart subtitle
+             */
+            subtitle?: string | null;
+            /**
+             * Template
+             * @description Plotly template
+             */
+            template?: string | null;
+            /**
+             * Width
+             * @description Chart width in pixels
+             */
+            width?: number | null;
+            /**
+             * Height
+             * @description Chart height in pixels
+             */
+            height?: number | null;
+            /**
+             * Opacity
+             * @description Opacity of sectors
+             */
+            opacity?: number | null;
+            /**
+             * Hole
+             * @description Fraction of radius to cut out (for donut chart)
+             */
+            hole?: number | null;
         };
         /** PlotlyFigure */
         PlotlyFigure: {
@@ -170,6 +1148,266 @@ export interface components {
             config?: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** ScatterChartConfig */
+        ScatterChartConfig: {
+            /**
+             * X
+             * @description The column name(s) to use for the x-axis
+             */
+            x?: string | string[] | null;
+            /**
+             * Y
+             * @description The column name(s) to use for the y-axis
+             */
+            y?: string | string[] | null;
+            /**
+             * Color
+             * @description Column name for color encoding
+             */
+            color?: string | null;
+            /**
+             * Symbol
+             * @description Column name for symbol encoding
+             */
+            symbol?: string | null;
+            /**
+             * Size
+             * @description Column name for size encoding
+             */
+            size?: string | null;
+            /**
+             * Hover Name
+             * @description Column name for hover name
+             */
+            hover_name?: string | null;
+            /**
+             * Hover Data
+             * @description Columns to show in hover tooltip
+             */
+            hover_data?: string[] | {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Custom Data
+             * @description Custom data columns
+             */
+            custom_data?: string[] | null;
+            /**
+             * Text
+             * @description Column name for text labels
+             */
+            text?: string | null;
+            /**
+             * Facet Row
+             * @description Column name for facet rows
+             */
+            facet_row?: string | null;
+            /**
+             * Facet Col
+             * @description Column name for facet columns
+             */
+            facet_col?: string | null;
+            /**
+             * Facet Col Wrap
+             * @description Maximum number of facet columns
+             * @default 0
+             */
+            facet_col_wrap: number;
+            /**
+             * Facet Row Spacing
+             * @description Spacing between facet rows
+             */
+            facet_row_spacing?: number | null;
+            /**
+             * Facet Col Spacing
+             * @description Spacing between facet columns
+             */
+            facet_col_spacing?: number | null;
+            /**
+             * Error X
+             * @description Column name for x error bars
+             */
+            error_x?: string | null;
+            /**
+             * Error X Minus
+             * @description Column name for x error bars (minus)
+             */
+            error_x_minus?: string | null;
+            /**
+             * Error Y
+             * @description Column name for y error bars
+             */
+            error_y?: string | null;
+            /**
+             * Error Y Minus
+             * @description Column name for y error bars (minus)
+             */
+            error_y_minus?: string | null;
+            /**
+             * Animation Frame
+             * @description Column name for animation frames
+             */
+            animation_frame?: string | null;
+            /**
+             * Animation Group
+             * @description Column name for animation groups
+             */
+            animation_group?: string | null;
+            /**
+             * Category Orders
+             * @description Dictionary of category orders
+             */
+            category_orders?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Labels
+             * @description Dictionary of axis labels
+             */
+            labels?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Orientation
+             * @description Orientation ('v' or 'h')
+             */
+            orientation?: string | null;
+            /**
+             * Color Discrete Sequence
+             * @description Sequence of discrete colors
+             */
+            color_discrete_sequence?: string[] | null;
+            /**
+             * Color Discrete Map
+             * @description Mapping of values to colors
+             */
+            color_discrete_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Color Continuous Scale
+             * @description Continuous color scale
+             */
+            color_continuous_scale?: unknown[] | string | null;
+            /**
+             * Range Color
+             * @description Range of color scale
+             */
+            range_color?: unknown[] | null;
+            /**
+             * Color Continuous Midpoint
+             * @description Midpoint of color scale
+             */
+            color_continuous_midpoint?: number | null;
+            /**
+             * Symbol Sequence
+             * @description Sequence of symbols
+             */
+            symbol_sequence?: string[] | null;
+            /**
+             * Symbol Map
+             * @description Mapping of values to symbols
+             */
+            symbol_map?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Opacity
+             * @description Opacity of markers
+             */
+            opacity?: number | null;
+            /**
+             * Size Max
+             * @description Maximum marker size
+             */
+            size_max?: number | null;
+            /**
+             * Marginal X
+             * @description Marginal plot type for x-axis
+             */
+            marginal_x?: string | null;
+            /**
+             * Marginal Y
+             * @description Marginal plot type for y-axis
+             */
+            marginal_y?: string | null;
+            /**
+             * Trendline
+             * @description Trendline type ('ols', 'lowess', etc.)
+             */
+            trendline?: string | null;
+            /**
+             * Trendline Options
+             * @description Options for trendline
+             */
+            trendline_options?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Trendline Color Override
+             * @description Color for trendline
+             */
+            trendline_color_override?: string | null;
+            /**
+             * Trendline Scope
+             * @description Scope for trendline
+             * @default trace
+             */
+            trendline_scope: string;
+            /**
+             * Log X
+             * @description Use log scale for x-axis
+             * @default false
+             */
+            log_x: boolean;
+            /**
+             * Log Y
+             * @description Use log scale for y-axis
+             * @default false
+             */
+            log_y: boolean;
+            /**
+             * Range X
+             * @description Range for x-axis
+             */
+            range_x?: unknown[] | null;
+            /**
+             * Range Y
+             * @description Range for y-axis
+             */
+            range_y?: unknown[] | null;
+            /**
+             * Render Mode
+             * @description Render mode
+             * @default auto
+             */
+            render_mode: string;
+            /**
+             * Title
+             * @description Chart title
+             */
+            title?: string | null;
+            /**
+             * Subtitle
+             * @description Chart subtitle
+             */
+            subtitle?: string | null;
+            /**
+             * Template
+             * @description Plotly template
+             */
+            template?: string | null;
+            /**
+             * Width
+             * @description Chart width in pixels
+             */
+            width?: number | null;
+            /**
+             * Height
+             * @description Chart height in pixels
+             */
+            height?: number | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -260,6 +1498,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DashboardState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluate_dashboard_api_dashboard_evaluation_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DashboardEvaluationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardEvaluationResult"];
                 };
             };
             /** @description Validation Error */

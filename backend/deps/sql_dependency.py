@@ -383,8 +383,8 @@ class SQLBaseDependency(BaseModel):
         for parameter in dashboard_evaluation_sql_query.dashboard_sql_query_parameter_values:
             
             query = query.replace(
-                "{" + repr(parameter.parameter_config.name) + "}",
-                parameter.value
+                "{" + parameter.parameter_config.name + "}",
+                repr(parameter.value)
             )
             
         df = self.get_dataframe_from_query(query=query)
@@ -400,7 +400,7 @@ class SQLBaseDependency(BaseModel):
             dashboard_evaluation_sql_query=dashboard_evaluation_request.dashboard_evaluation_sql_query
         )
         
-        chart = dashboard_evaluation_request.chart_config.get_figure(dataframe=dataframe)
+        chart = dashboard_evaluation_request.chart_config.get_figure(dataframe=DataFrame(**dataframe.model_dump()))
         
         return DashboardEvaluationResult(
             data_frame=dataframe,

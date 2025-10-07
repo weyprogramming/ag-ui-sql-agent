@@ -10,6 +10,8 @@ class SQLAgentSettings(BaseSettings):
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
 
+    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+
     DB_PASSWORD_KEY: str = Fernet.generate_key().decode()
     
     model_config = SettingsConfigDict(
