@@ -1,4 +1,11 @@
-from deps.sql_dependency import *
+from cryptography.fernet import Fernet
+
+from deps.sql_dependency import (
+    SQLBaseDependency, 
+    SQLConnectionParams, 
+    SQLType
+)
+from settings import settings
 
 # TODO: Rework this as this is just a workaround. Database schema information will be stored in redis later on
 

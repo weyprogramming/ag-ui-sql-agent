@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Literal, List
 
 from datetime import datetime, date, time
@@ -12,20 +10,6 @@ from results.plotly_chart_config_results import BarChartConfig, LineChartConfig,
 
 SQLQueryParameterType = Literal["str", "int", "float", "date", "bool", "datetime", "time"]
 
-class DashboardConfig(BaseModel):
-    title: str
-    dashboard_sql_query: DashboardSQLQuery
-    chart_config: BarChartConfig | LineChartConfig | PieChartConfig | ScatterChartConfig | HistogramChartConfig | BoxChartConfig
-    
-class DashboardSQLQuery(BaseModel):
-    parametrized_query: str = Field(
-        description="A parametrized SQL query with parameters in curly braces, e.g. SELECT * FROM table WHERE column = {parameter}"
-    )
-    dashboard_sql_query_parameters: List[DashboardSQLQueryParameter] = Field(
-        description="A list of parameters used in the parametrized_query"
-    )
-    
-
 class DashboardSQLQueryParameter(BaseModel):
     name: str = Field(
         description="The name of the parameter, e.g. 'parameter' for {parameter}"
@@ -36,5 +20,16 @@ class DashboardSQLQueryParameter(BaseModel):
     example_value: str | int | float | date | bool | datetime | time = Field(
         description="An example value for the parameter, e.g. 'example' for a str parameter"
     )
-    
-DashboardConfig.model_rebuild()
+
+class DashboardSQLQuery(BaseModel):
+    parametrized_query: str = Field(
+        description="A parametrized SQL query with parameters in curly braces, e.g. SELECT * FROM table WHERE column = {parameter}"
+    )
+    dashboard_sql_query_parameters: List[DashboardSQLQueryParameter] = Field(
+        description="A list of parameters used in the parametrized_query"
+    )
+
+class DashboardConfig(BaseModel):
+    title: str
+    dashboard_sql_query: DashboardSQLQuery
+    chart_config: BarChartConfig | LineChartConfig | PieChartConfig | ScatterChartConfig | HistogramChartConfig | BoxChartConfig

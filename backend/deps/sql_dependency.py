@@ -40,7 +40,7 @@ class SQLConnectionParams(BaseModel):
     encrypted_password: bytes
     database: str
     
-    @computed_field
+    @property
     def password(self) -> str:
         return Fernet(settings.DB_PASSWORD_KEY).decrypt(self.encrypted_password).decode()
     
