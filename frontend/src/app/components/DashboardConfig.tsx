@@ -1,12 +1,13 @@
 import { useCoAgent } from "@copilotkit/react-core";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 
 import SQLMarkdown from "./SQLMarkdown";
 import PandasDataFrame from "./PandasDataFrame";
 import PlotlyFigure from "./PlotlyFigure";
+import CreateSqlDependencyButton from "./CreateSqlDependencyButton";
 
-import { accesifyClient } from "@/sdk";
+import { accesifyClient, type SqlDependencyModel } from "@/sdk";
 import type { components } from "../types/accesify";
 
 type AgentState = components["schemas"]["DashboardState"];
@@ -80,9 +81,24 @@ function parseParameterValue(
 }
 
 export default function DashboardState() {
-    const { state } = useCoAgent<AgentState>({
+    const { state, setState } = useCoAgent<AgentState>({
         name: "dashboard_agent",
     });
+
+    const handleDependencySelect = useCallback(
+        (dependency: SqlDependencyModel | null) => {
+            setState((previous) => {
+                const prior = previous ?? ({} as AgentState);
+                return {
+                    ...prior,
+                    selected_sql_dependency: dependency
+                        ? dependency.pk ?? dependency.name ?? null
+                        : null,
+                };
+            });
+        },
+        [setState]
+    );
 
     const [activeTab, setActiveTab] = useState<"dataframe" | "figure">("figure");
     const [parameterValues, setParameterValues] = useState<Record<string, string>>({});
@@ -173,6 +189,7 @@ export default function DashboardState() {
     return (
         <div className="p-4 bg-white min-h-screen">
             <div className="mx-auto flex max-w-6xl flex-col gap-6">
+                <CreateSqlDependencyButton onSelect={handleDependencySelect} />
                 <section className="rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm">
                     <header className="mb-4 flex items-center justify-between">
                         <div>

@@ -10,6 +10,7 @@ class DashboardState(BaseModel):
     dashboard_config: DashboardConfig | None = None
     test_dateframe: PandasDataFrame | None = None
     test_figure: PlotlyFigure | None = None
+    selected_sql_dependency: str | None = None
 
 @dataclass
 class State:

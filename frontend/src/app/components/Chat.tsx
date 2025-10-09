@@ -1,12 +1,6 @@
 import "@copilotkit/react-ui/styles.css";
-import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
-import { CopilotKitCSSProperties, CopilotChat, Markdown, CopilotSidebar, CopilotPopup } from "@copilotkit/react-ui";
-import { type WindowProps, useChatContext } from "@copilotkit/react-ui";
-import { CopilotKit } from "@copilotkit/react-core";
-import { type MessagesProps } from "@copilotkit/react-ui";
-
-import "@copilotkit/react-ui/styles.css";
-
+import { useCopilotAction } from "@copilotkit/react-core";
+import { CopilotPopup } from "@copilotkit/react-ui";
 
 import SQLMarkdown from "../components/SQLMarkdown";
 import PandasDataFrame from "../components/PandasDataFrame";

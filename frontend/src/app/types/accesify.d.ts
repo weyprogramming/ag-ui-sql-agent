@@ -56,6 +56,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sql-dependency": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get All Sql Dependencies */
+        get: operations["get_all_sql_dependencies_api_sql_dependency_get"];
+        put?: never;
+        /** Create Sql Dependency */
+        post: operations["create_sql_dependency_api_sql_dependency_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sql-dependency/{dependency_pk}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Sql Dependency */
+        get: operations["get_sql_dependency_api_sql_dependency__dependency_pk__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -488,13 +523,13 @@ export interface components {
         };
         /** DashboardConfigModel */
         DashboardConfigModel: {
+            /** Pk */
+            pk?: string | null;
             /** Title */
             title: string;
             dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
             /** Chart Config */
             chart_config: components["schemas"]["BarChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BoxChartConfig"];
-            /** Pk */
-            pk?: string | null;
         } & {
             [key: string]: unknown;
         };
@@ -559,6 +594,8 @@ export interface components {
             dashboard_config?: components["schemas"]["DashboardConfig-Output"] | null;
             test_dateframe?: components["schemas"]["PandasDataFrame"] | null;
             test_figure?: components["schemas"]["PlotlyFigure"] | null;
+            /** Selected Sql Dependency */
+            selected_sql_dependency?: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1149,6 +1186,133 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** SQLBaseDependencyCreateRequest */
+        SQLBaseDependencyCreateRequest: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "sqlite" | "postgres" | "mysql" | "mssql";
+            /** Name */
+            name: string;
+            /** Host */
+            host: string;
+            /** Port */
+            port: number;
+            /** Database */
+            database: string;
+            /** Username */
+            username: string;
+            /** Password */
+            password: string;
+        };
+        /** SQLBaseDependencyModel */
+        SQLBaseDependencyModel: {
+            /** Pk */
+            pk?: string | null;
+            /** Name */
+            name: string;
+            connection_params?: components["schemas"]["SQLConnectionParams"] | null;
+            /** Tables */
+            tables?: components["schemas"]["SQLDatabaseTable"][] | null;
+            /** Table Subset */
+            table_subset?: components["schemas"]["SQLDatabaseTable"][] | null;
+            /** Column Names To Exclude */
+            column_names_to_exclude?: string[] | null;
+        } & {
+            [key: string]: unknown;
+        };
+        /** SQLConnectionParams */
+        SQLConnectionParams: {
+            type: components["schemas"]["SQLType"];
+            /** Host */
+            host: string;
+            /** Port */
+            port: number;
+            /** Username */
+            username: string;
+            /**
+             * Encrypted Password
+             * Format: binary
+             */
+            encrypted_password: string;
+            /** Database */
+            database: string;
+        };
+        /** SQLDatabaseTable */
+        SQLDatabaseTable: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id?: string;
+            /** Table Name */
+            table_name: string;
+            /** Description */
+            description: string | null;
+            /** Comment */
+            comment: string | null;
+            /**
+             * Columns
+             * @default []
+             */
+            columns: components["schemas"]["SQLTableColumn"][];
+        };
+        /** SQLJoin */
+        SQLJoin: {
+            /** Table */
+            table: string;
+            /**
+             * Table Id
+             * Format: uuid
+             */
+            table_id: string;
+            /** Column Key */
+            column_key: string;
+            /**
+             * Column Id
+             * Format: uuid
+             */
+            column_id: string;
+        };
+        /** SQLTableColumn */
+        SQLTableColumn: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id?: string;
+            /**
+             * Table Id
+             * Format: uuid
+             */
+            table_id: string;
+            /**
+             * Exclude
+             * @default false
+             */
+            exclude: boolean;
+            /** Name */
+            name: string;
+            /** Key */
+            key: string;
+            /** Type */
+            type?: string | null;
+            /** Nullable */
+            nullable?: boolean | null;
+            /** Primary Key */
+            primary_key?: boolean | null;
+            /** Unique */
+            unique?: boolean | null;
+            /** Comment */
+            comment?: string | null;
+            join?: components["schemas"]["SQLJoin"] | null;
+        };
+        /**
+         * SQLType
+         * @enum {string}
+         */
+        SQLType: "mssql" | "mysql" | "postgres" | "sqlite";
         /** ScatterChartConfig */
         ScatterChartConfig: {
             /**
@@ -1531,6 +1695,90 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DashboardEvaluationResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_all_sql_dependencies_api_sql_dependency_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SQLBaseDependencyModel"][];
+                };
+            };
+        };
+    };
+    create_sql_dependency_api_sql_dependency_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SQLBaseDependencyCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SQLBaseDependencyModel"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_sql_dependency_api_sql_dependency__dependency_pk__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dependency_pk: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SQLBaseDependencyModel"];
                 };
             };
             /** @description Validation Error */

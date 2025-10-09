@@ -7,6 +7,8 @@ type DashboardEvaluationRequest = components["schemas"]["DashboardEvaluationRequ
 type DashboardEvaluationResult = components["schemas"]["DashboardEvaluationResult"];
 type DashboardState = components["schemas"]["DashboardState"];
 type ValidationError = components["schemas"]["HTTPValidationError"];
+type SqlDependencyCreateRequest = components["schemas"]["SQLBaseDependencyCreateRequest"];
+type SqlDependencyModel = components["schemas"]["SQLBaseDependencyModel"];
 
 export interface AccesifyClientOptions {
   /** Override the base URL for the FastAPI service (e.g. http://localhost:8000). */
@@ -111,6 +113,26 @@ export class AccesifyClient {
       method: "GET",
     });
   }
+
+  /** GET /api/sql-dependency */
+  async getSqlDependencies(): Promise<SqlDependencyModel[]> {
+    return this.request<SqlDependencyModel[]>("/api/sql-dependency", {
+      method: "GET",
+    });
+  }
+
+  /** POST /api/sql-dependency */
+  async createSqlDependency(
+    payload: SqlDependencyCreateRequest
+  ): Promise<SqlDependencyModel> {
+    return this.request<SqlDependencyModel>("/api/sql-dependency", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  }
 }
 
 export type {
@@ -121,6 +143,8 @@ export type {
   DashboardEvaluationResult,
   DashboardState,
   ValidationError,
+  SqlDependencyCreateRequest,
+  SqlDependencyModel,
 };
 
 export const accesifyClient = new AccesifyClient();
