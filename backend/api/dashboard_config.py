@@ -2,17 +2,9 @@ from typing import List
 
 from fastapi import APIRouter
 
-from models.dashboard_config_models import DashboardConfig, DashboardConfigModel
+from models.dashboard_config_models import DashboardConfigModel
 
 router = APIRouter()
-
-@router.post("/dashboard-config")
-async def create_dashboard_config(
-    dashboard_config: DashboardConfig
-) -> DashboardConfig:
-    dashboard_config_model = DashboardConfigModel.model_validate(dashboard_config)
-    await dashboard_config_model.save()
-    return dashboard_config_model
     
 @router.get("/dashboard-config")
 async def get_dashboards() -> List[DashboardConfigModel]:

@@ -18,7 +18,7 @@ from pandas import DataFrame, read_sql_query
 
 
 from settings import settings
-from results.dashboard_config_results import DashboardSQLQuery
+from results.dashboard_config_results import DashboardSQLQueryResult
 from results.tool_results import PandasDataFrame
 from schemas.dashboard_evaluation import DashboardEvaluationRequest, DashboardEvaluationSQLQuery, DashboardEvaluationResult
 
@@ -358,7 +358,7 @@ class SQLBaseDependency(BaseModel):
         return None
     
     
-    def test_dashboard_sql_query(self, dashboard_sql_query: DashboardSQLQuery) -> PandasDataFrame:
+    def test_dashboard_sql_query(self, dashboard_sql_query: DashboardSQLQueryResult) -> PandasDataFrame:
         
         query = dashboard_sql_query.parametrized_query
         
@@ -366,7 +366,7 @@ class SQLBaseDependency(BaseModel):
             
             query = query.replace(
                 "{" + parameter.name + "}",
-                repr(parameter.example_value)
+                repr(parameter.default_value)
             )
             
         df = self.get_dataframe_from_query(query)

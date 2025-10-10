@@ -15,14 +15,14 @@ type DashboardParameter = components["schemas"]["DashboardSQLQueryParameter"];
 type DashboardEvaluationResult = components["schemas"]["DashboardEvaluationResult"];
 
 function defaultParameterValue(param: DashboardParameter): string {
-    const { example_value } = param;
-    if (example_value === null || example_value === undefined) {
+    const { default_value } = param;
+    if (default_value === null || default_value === undefined) {
         return "";
     }
-    if (typeof example_value === "object") {
-        return JSON.stringify(example_value);
+    if (typeof default_value === "object") {
+        return JSON.stringify(default_value);
     }
-    return String(example_value);
+    return String(default_value);
 }
 
 function getInputType(parameterType: DashboardParameter["type"]): string {
@@ -91,7 +91,7 @@ export default function DashboardState() {
                 const prior = previous ?? ({} as AgentState);
                 return {
                     ...prior,
-                    selected_sql_dependency: dependency
+                    selected_sql_dependency_id: dependency
                         ? dependency.pk ?? dependency.name ?? null
                         : null,
                 };
@@ -111,7 +111,7 @@ export default function DashboardState() {
 
     const parameters = useMemo(
         () =>
-            dashboardConfig?.dashboard_sql_query.dashboard_sql_query_parameters ??
+            dashboardConfig?.dashboard_sql_query?.dashboard_sql_query_parameters ??
             [],
         [dashboardConfig]
     );
@@ -132,7 +132,7 @@ export default function DashboardState() {
         });
     }, [parameters]);
 
-    const displayedDataFrame = evaluationResult?.data_frame ?? state.test_dateframe;
+    const displayedDataFrame = evaluationResult?.data_frame ?? state.test_dataframe;
     const displayedFigure = evaluationResult?.figure ?? state.test_figure;
 
     const handleInputChange = (name: string, value: string) => {
@@ -156,21 +156,26 @@ export default function DashboardState() {
                 }
 
                 return {
-                    parameter_config: parameter,
+                    name: parameter.name,
                     value: parseParameterValue(rawValue, parameter),
                 };
             });
 
+            const parametrizedQuery =
+                dashboardConfig.dashboard_sql_query?.parametrized_query;
+            if (!parametrizedQuery) {
+                throw new Error("Dashboard SQL query is missing.");
+            }
+
             const evaluationPayload = {
                 dashboard_evaluation_sql_query: {
-                    parametrized_query:
-                        dashboardConfig.dashboard_sql_query.parametrized_query,
+                    parametrized_query: parametrizedQuery,
                     dashboard_sql_query_parameter_values: parameterValuesPayload,
                 },
                 chart_config: dashboardConfig.chart_config,
             };
 
-            const result = await accesifyClient.evaluateDashboard(evaluationPayload);
+            const result = await accesifyClient.evaluateDashboard(evaluationPayload as any);
             setEvaluationResult(result);
             if (result.figure) {
                 setActiveTab("figure");
@@ -210,7 +215,10 @@ export default function DashboardState() {
                                     SQL Query
                                 </h3>
                                 <SQLMarkdown
-                                    query={dashboardConfig.dashboard_sql_query.parametrized_query}
+                                    query={
+                                        dashboardConfig.dashboard_sql_query?.parametrized_query ??
+                                        ""
+                                    }
                                 />
                             </div>
 
@@ -258,9 +266,9 @@ export default function DashboardState() {
                                                         className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     />
                                                 )}
-                                                {parameter.example_value !== undefined && (
+                                                {parameter.default_value !== undefined && (
                                                     <span className="text-xs text-gray-500">
-                                                        Example: {String(parameter.example_value)}
+                                                        Example: {String(parameter.default_value)}
                                                     </span>
                                                 )}
                                             </label>

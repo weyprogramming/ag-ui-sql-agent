@@ -1,19 +1,18 @@
-from typing import Literal, List
+from datetime import date, datetime, time
+from typing import List
 
-from datetime import datetime, date, time
+from pydantic import BaseModel
 
-from pydantic import field_validator, BaseModel
 
-from aredis_om import EmbeddedJsonModel, JsonModel
-
-from models.sql_dependency_model import SQLBaseDependencyModel
-from results.dashboard_config_results import DashboardSQLQueryResult
-from results.plotly_chart_config_results import BarChartConfig, LineChartConfig, PieChartConfig, ScatterChartConfig, HistogramChartConfig, BoxChartConfig
+from results.plotly_chart_config_results import BoxChartConfig, ScatterChartConfig, PieChartConfig, LineChartConfig, HistogramChartConfig, BarChartConfig
 from results.tool_results import PandasDataFrame, PlotlyFigure
+from results.dashboard_config_results import DashboardSQLQueryResult
 from schemas.dashboard_evaluation import DashboardSQLQueryParameterValue
+from models.sql_dependency_model import SQLBaseDependencyModel
 
 
-class DashboardSQLQueryModel(DashboardSQLQueryResult):
+
+class DashboardSQLQueryState(DashboardSQLQueryResult):
     sql_dependency_id: str
     
     async def get_sql_dependency(self) -> SQLBaseDependencyModel:
@@ -49,6 +48,6 @@ class DashboardSQLQueryModel(DashboardSQLQueryResult):
         return PandasDataFrame.from_dataframe(sql_dependency.get_dataframe_from_query(query))
 
 
-class DashboardConfigModel(JsonModel):
-    dashboard_sql_query: DashboardSQLQueryModel | None = None
+class DashboardConfigState(BaseModel):
+    dashboard_sql_query: DashboardSQLQueryState | None = None
     chart_config: BoxChartConfig | ScatterChartConfig | PieChartConfig | LineChartConfig | HistogramChartConfig | BarChartConfig | None = None

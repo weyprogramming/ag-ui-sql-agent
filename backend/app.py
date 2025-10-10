@@ -10,12 +10,12 @@ from aredis_om import get_redis_connection
 
 from pydantic_ai.ag_ui import handle_ag_ui_request, StateDeps
 
+import logfire
 
 from dotenv import load_dotenv
 load_dotenv()
 
-from deps.current_sql_dep import current_sql_dep
-from states.dashboard_state import State, DashboardState
+from states.dashboard_state import DashboardState
 from models.dashboard_config_models import DashboardConfigModel
 from models.sql_dependency_model import SQLBaseDependencyModel
 from settings import settings
@@ -54,10 +54,12 @@ app.include_router(sql_dependency_router, prefix="/api")
 @app.post("/")
 async def run_agent(request: Request) -> Response:
     
-    deps = State(sql_dependency=current_sql_dep, state=DashboardState())
-    
     return await handle_ag_ui_request(
         agent=dashboard_agent, 
         request=request,
-        deps=deps
+        deps=StateDeps(DashboardState())
     )
+    
+logfire.configure()
+logfire.instrument_fastapi(app)
+logfire.instrument_pydantic_ai(dashboard_agent)

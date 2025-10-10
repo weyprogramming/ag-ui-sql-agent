@@ -14,8 +14,7 @@ export interface paths {
         /** Get Dashboards */
         get: operations["get_dashboards_api_dashboard_config_get"];
         put?: never;
-        /** Create Dashboard Config */
-        post: operations["create_dashboard_config_api_dashboard_config_post"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -505,33 +504,21 @@ export interface components {
              */
             height?: number | null;
         };
-        /** DashboardConfig */
-        "DashboardConfig-Input": {
-            /** Title */
-            title: string;
-            dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
-            /** Chart Config */
-            chart_config: components["schemas"]["BarChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BoxChartConfig"];
-        };
-        /** DashboardConfig */
-        "DashboardConfig-Output": {
-            /** Title */
-            title: string;
-            dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
-            /** Chart Config */
-            chart_config: components["schemas"]["BarChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BoxChartConfig"];
-        };
         /** DashboardConfigModel */
         DashboardConfigModel: {
             /** Pk */
             pk?: string | null;
-            /** Title */
-            title: string;
-            dashboard_sql_query: components["schemas"]["DashboardSQLQuery"];
+            dashboard_sql_query?: components["schemas"]["DashboardSQLQueryModel"] | null;
             /** Chart Config */
-            chart_config: components["schemas"]["BarChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BoxChartConfig"];
+            chart_config?: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"] | null;
         } & {
             [key: string]: unknown;
+        };
+        /** DashboardConfigState */
+        DashboardConfigState: {
+            dashboard_sql_query?: components["schemas"]["DashboardSQLQueryState"] | null;
+            /** Chart Config */
+            chart_config?: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"] | null;
         };
         /** DashboardEvaluationRequest */
         DashboardEvaluationRequest: {
@@ -551,8 +538,8 @@ export interface components {
             /** Dashboard Sql Query Parameter Values */
             dashboard_sql_query_parameter_values: components["schemas"]["DashboardSQLQueryParameterValue"][];
         };
-        /** DashboardSQLQuery */
-        DashboardSQLQuery: {
+        /** DashboardSQLQueryModel */
+        DashboardSQLQueryModel: {
             /**
              * Parametrized Query
              * @description A parametrized SQL query with parameters in curly braces, e.g. SELECT * FROM table WHERE column = {parameter}
@@ -563,6 +550,8 @@ export interface components {
              * @description A list of parameters used in the parametrized_query
              */
             dashboard_sql_query_parameters: components["schemas"]["DashboardSQLQueryParameter"][];
+            /** Sql Dependency Id */
+            sql_dependency_id: string;
         };
         /** DashboardSQLQueryParameter */
         DashboardSQLQueryParameter: {
@@ -578,24 +567,41 @@ export interface components {
              */
             type: "str" | "int" | "float" | "date" | "bool" | "datetime" | "time";
             /**
-             * Example Value
+             * Default Value
              * @description An example value for the parameter, e.g. 'example' for a str parameter
              */
-            example_value: string | number | boolean;
+            default_value: string | number | boolean;
         };
         /** DashboardSQLQueryParameterValue */
         DashboardSQLQueryParameterValue: {
-            parameter_config: components["schemas"]["DashboardSQLQueryParameter"];
+            /** Name */
+            name: string;
             /** Value */
             value: string | number | boolean;
         };
+        /** DashboardSQLQueryState */
+        DashboardSQLQueryState: {
+            /**
+             * Parametrized Query
+             * @description A parametrized SQL query with parameters in curly braces, e.g. SELECT * FROM table WHERE column = {parameter}
+             */
+            parametrized_query: string;
+            /**
+             * Dashboard Sql Query Parameters
+             * @description A list of parameters used in the parametrized_query
+             */
+            dashboard_sql_query_parameters: components["schemas"]["DashboardSQLQueryParameter"][];
+            /** Sql Dependency Id */
+            sql_dependency_id: string;
+        };
         /** DashboardState */
         DashboardState: {
-            dashboard_config?: components["schemas"]["DashboardConfig-Output"] | null;
-            test_dateframe?: components["schemas"]["PandasDataFrame"] | null;
+            /** @default {} */
+            dashboard_config: components["schemas"]["DashboardConfigState"];
+            test_dataframe?: components["schemas"]["PandasDataFrame"] | null;
             test_figure?: components["schemas"]["PlotlyFigure"] | null;
-            /** Selected Sql Dependency */
-            selected_sql_dependency?: string | null;
+            /** Selected Sql Dependency Id */
+            selected_sql_dependency_id?: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1607,39 +1613,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DashboardConfigModel"][];
-                };
-            };
-        };
-    };
-    create_dashboard_config_api_dashboard_config_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DashboardConfig-Input"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DashboardConfig-Output"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

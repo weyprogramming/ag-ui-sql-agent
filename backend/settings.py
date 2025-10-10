@@ -2,7 +2,7 @@ from cryptography.fernet import Fernet
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-class SQLAgentSettings(BaseSettings):
+class DashboardAgentSettings(BaseSettings):
 
     OPENAI_API_KEY: str | None = None
     ANTHROPIC_API_KEY: str | None = None
@@ -12,7 +12,7 @@ class SQLAgentSettings(BaseSettings):
 
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
-    DB_PASSWORD_KEY: str = Fernet.generate_key().decode()
+    DB_PASSWORD_KEY: str
     
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -20,4 +20,4 @@ class SQLAgentSettings(BaseSettings):
         extra='allow'
     )
     
-settings = SQLAgentSettings()
+settings = DashboardAgentSettings()

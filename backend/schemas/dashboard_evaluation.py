@@ -7,12 +7,11 @@ from typing import List
 from pydantic import BaseModel
 
 
-from results.dashboard_config_results import DashboardConfig, DashboardSQLQueryParameter
 from results.plotly_chart_config_results import BoxChartConfig, ScatterChartConfig, PieChartConfig, LineChartConfig, HistogramChartConfig, BarChartConfig
 from results.tool_results import PandasDataFrame, PlotlyFigure
 
 class DashboardSQLQueryParameterValue(BaseModel):
-    parameter_config: DashboardSQLQueryParameter
+    name: str
     value: str | int | float | bool | datetime | date | time
     
 class DashboardEvaluationSQLQuery(BaseModel):

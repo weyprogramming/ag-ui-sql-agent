@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from aredis_om import JsonModel
 
 from deps.sql_dependency import SQLBaseDependency
