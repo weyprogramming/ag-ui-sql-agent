@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from pandas import DataFrame
 from pydantic import BaseModel, Field
 
 from plotly.express import bar, line, scatter, box, pie, histogram
@@ -336,7 +337,7 @@ class BoxChartConfig(PlotlyChartConfigBase):
     width: int | None = Field(default=None, description="Chart width in pixels")
     height: int | None = Field(default=None, description="Chart height in pixels")
     
-    def get_figure(self, dataframe) -> PlotlyFigure:
+    def get_figure(self, dataframe: DataFrame) -> PlotlyFigure:
         fig = box(
             dataframe,
             x=self.x,

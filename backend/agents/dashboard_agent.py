@@ -127,6 +127,9 @@ async def create_dashboard_config(
         raise ModelRetry("No SQL query configured for the dashboard")
     
     ctx.deps.state.dashboard_config.chart_config = chart_config
+    ctx.deps.state.test_figure = chart_config.get_figure(
+        dataframe=ctx.deps.state.test_dataframe.to_dataframe()
+    )
     
     return ToolReturn(
         return_value=ctx.deps.state.dashboard_config,

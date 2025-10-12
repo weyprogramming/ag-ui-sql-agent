@@ -25,6 +25,9 @@ class PandasDataFrame(BaseModel):
             columns=df.columns.tolist(),
             index=df.index.tolist() if df.index is not None else None
         )
+        
+    def to_dataframe(self) -> DataFrame:
+        return DataFrame(**self.model_dump())
     
 class PlotlyFigure(BaseModel):
     data: List[Dict]
@@ -37,5 +40,5 @@ class PlotlyFigure(BaseModel):
             **json.loads(fig.to_json())
         )
         
-    
-    
+    def to_figure(self) -> Figure:
+        return Figure(**self.model_dump())
