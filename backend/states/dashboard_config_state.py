@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from results.plotly_chart_config_results import BoxChartConfig, ScatterChartConfig, PieChartConfig, LineChartConfig, HistogramChartConfig, BarChartConfig
 from results.tool_results import PandasDataFrame, PlotlyFigure
 from results.dashboard_config_results import DashboardSQLQueryResult
-from schemas.dashboard_evaluation import DashboardSQLQueryParameterValue
+from schemas.dashboard_evaluation import DashboardSQLQueryParameterValue, DashboardSQLQueryParameter, DashboardEvaluationRequest, DashboardEvaluationResponse, DashboardEvaluationSQLQuery
 from models.sql_dependency_model import SQLBaseDependencyModel
 
 
@@ -19,35 +19,32 @@ class DashboardSQLQueryState(DashboardSQLQueryResult):
         return await SQLBaseDependencyModel.get(self.sql_dependency_id)
 
 
-    def evaluate_query(self, parameter_values: List[DashboardSQLQueryParameterValue]) -> str:
-        evaluated_query = self.parametrized_query
-        
-        for param in parameter_values:
-            placeholder = "{" + param.name + "}"
-            
-            if placeholder not in evaluated_query:
-                raise ValueError(f"Parameter '{param.name}' not found in query")
-            
-            if isinstance(param.value, str):
-                value_str = f"'{param.value}'"
-            elif isinstance(param.value, bool):
-                value_str = 'TRUE' if param.value else 'FALSE'
-            elif isinstance(param.value, (datetime, date, time)):
-                value_str = f"'{param.value.isoformat()}'"
-            else:
-                value_str = str(param.value)
-            
-            evaluated_query = evaluated_query.replace(placeholder, value_str)
-        
-        return evaluated_query
-    
-    
-    async def execute_query(self, parameter_values: List[DashboardSQLQueryParameterValue]) -> PandasDataFrame:
-        sql_dependency = await self.get_sql_dependency()
-        query = self.evaluate_query(parameter_values)
-        return PandasDataFrame.from_dataframe(sql_dependency.get_dataframe_from_query(query))
-
-
 class DashboardConfigState(BaseModel):
     dashboard_sql_query: DashboardSQLQueryState | None = None
     chart_config: BoxChartConfig | ScatterChartConfig | PieChartConfig | LineChartConfig | HistogramChartConfig | BarChartConfig | None = None
+    
+    async def get_default_values_result(self) -> DashboardEvaluationResponse:
+        
+        if self.dashboard_sql_query is None or self.chart_config is None:
+            raise ValueError("Dashboard SQL query or chart configuration is not set")
+        
+        parameter_values: List[DashboardSQLQueryParameterValue] = [
+            DashboardSQLQueryParameterValue(
+                parameter=param,
+                value=param.default_value
+            )
+            for param in self.dashboard_sql_query.dashboard_sql_query_parameters
+        ]
+        
+        evaluation_request = DashboardEvaluationRequest(
+            dashboard_evaluation_sql_query=DashboardEvaluationSQLQuery(
+                sql_dependency_id=self.dashboard_sql_query.sql_dependency_id,
+                parametrized_query=self.dashboard_sql_query.parametrized_query,
+                dashboard_sql_query_parameter_values=parameter_values
+            ),
+            chart_config=self.chart_config
+        )
+        
+        return await evaluation_request.evaluate()
+        
+        

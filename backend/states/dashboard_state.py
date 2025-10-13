@@ -7,31 +7,43 @@ from aredis_om import NotFoundError
 from models.sql_dependency_model import SQLBaseDependencyModel
 from states.dashboard_config_state import DashboardConfigState
 from results.tool_results import PandasDataFrame, PlotlyFigure
-from schemas.dashboard_evaluation import DashboardSQLQueryParameterValue
+from schemas.dashboard_evaluation import DashboardSQLQueryParameterValue, DashboardEvaluationSQLQuery
 
 class DashboardState(BaseModel):
     dashboard_config: DashboardConfigState = DashboardConfigState()
-    test_dataframe: PandasDataFrame | None = None
-    test_figure: PlotlyFigure | None = None
+    default_dataframe: PandasDataFrame | None = None
+    default_figure: PlotlyFigure | None = None
     selected_sql_dependency_id: str | None = None
-    
-    async def evaluate_test_dataframe(self) -> PandasDataFrame | None:
 
-        if self.dashboard_config.dashboard_sql_query is None:
-            return None
+    async def evaluate_default_dataframe(self) -> None:
+        if self.dashboard_config is None:
+            raise ValueError("Dashboard configuration is not set")
         
-        else:
-            
-            dashboard_parameter_values: list[DashboardSQLQueryParameterValue] = [
+        if self.dashboard_config.dashboard_sql_query is None:
+            raise ValueError("Dashboard SQL query is not set")
+        
+        dashboard_evaluation_sql_query = DashboardEvaluationSQLQuery(
+            sql_dependency_id=self.dashboard_config.dashboard_sql_query.sql_dependency_id,
+            parametrized_query=self.dashboard_config.dashboard_sql_query.parametrized_query,
+            dashboard_sql_query_parameter_values=[
                 DashboardSQLQueryParameterValue(
-                    name=param.name,
+                    parameter=param,
                     value=param.default_value
                 )
                 for param in self.dashboard_config.dashboard_sql_query.dashboard_sql_query_parameters
             ]
+        )
+        
+        self.default_dataframe = await dashboard_evaluation_sql_query.evaluate()
+        
+    def evaluate_default_figure(self) -> None:
+        if self.default_dataframe is None:
+            raise ValueError("Default dataframe is not set")
+        
+        if self.dashboard_config.chart_config is None:
+            raise ValueError("Chart configuration is not set")
 
-            return await self.dashboard_config.dashboard_sql_query.execute_query(dashboard_parameter_values)
-
+        self.default_figure = self.dashboard_config.chart_config.get_figure(dataframe=self.default_dataframe.to_dataframe())
 
     async def get_sql_dependency(self) -> SQLBaseDependencyModel:
 

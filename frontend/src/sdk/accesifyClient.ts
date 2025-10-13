@@ -1,10 +1,9 @@
 import type { components } from "../app/types/accesify";
 
-type DashboardConfigInput = components["schemas"]["DashboardConfig-Input"];
-type DashboardConfigOutput = components["schemas"]["DashboardConfig-Output"];
+type DashboardConfigStateInput = components["schemas"]["DashboardConfigState-Input"];
 type DashboardConfigModel = components["schemas"]["DashboardConfigModel"];
-type DashboardEvaluationRequest = components["schemas"]["DashboardEvaluationRequest"];
-type DashboardEvaluationResult = components["schemas"]["DashboardEvaluationResult"];
+type DashboardEvaluationRequest = components["schemas"]["DashboardEvaluationRequest-Input"];
+type DashboardEvaluationResponse = components["schemas"]["DashboardEvaluationResponse"];
 type DashboardState = components["schemas"]["DashboardState"];
 type ValidationError = components["schemas"]["HTTPValidationError"];
 type SqlDependencyCreateRequest = components["schemas"]["SQLBaseDependencyCreateRequest"];
@@ -83,9 +82,9 @@ export class AccesifyClient {
 
   /** POST /api/dashboard-config */
   async createDashboardConfig(
-    payload: DashboardConfigInput
-  ): Promise<DashboardConfigOutput> {
-    return this.request<DashboardConfigOutput>("/api/dashboard-config", {
+    payload: DashboardConfigStateInput
+  ): Promise<DashboardConfigModel> {
+    return this.request<DashboardConfigModel>("/api/dashboard-config", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,17 +93,20 @@ export class AccesifyClient {
     });
   }
 
-  /** POST /api/dashboard-evaluation */
+  /** POST /api/dashboard-config/evaluate-state */
   async evaluateDashboard(
     payload: DashboardEvaluationRequest
-  ): Promise<DashboardEvaluationResult> {
-    return this.request<DashboardEvaluationResult>("/api/dashboard-evaluation", {
+  ): Promise<DashboardEvaluationResponse> {
+    return this.request<DashboardEvaluationResponse>(
+      "/api/dashboard-config/evaluate-state",
+      {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
-    });
+      }
+    );
   }
 
   /** GET /api/state/{state_id} */
@@ -136,11 +138,10 @@ export class AccesifyClient {
 }
 
 export type {
-  DashboardConfigInput,
-  DashboardConfigOutput,
+  DashboardConfigStateInput,
   DashboardConfigModel,
   DashboardEvaluationRequest,
-  DashboardEvaluationResult,
+  DashboardEvaluationResponse,
   DashboardState,
   ValidationError,
   SqlDependencyCreateRequest,

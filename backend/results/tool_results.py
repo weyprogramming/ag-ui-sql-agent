@@ -29,6 +29,7 @@ class PandasDataFrame(BaseModel):
     def to_dataframe(self) -> DataFrame:
         return DataFrame(**self.model_dump())
     
+    
 class PlotlyFigure(BaseModel):
     data: List[Dict]
     layout: Dict[str, Any] | None = None

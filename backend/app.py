@@ -20,9 +20,8 @@ from models.dashboard_config_models import DashboardConfigModel
 from models.sql_dependency_model import SQLBaseDependencyModel
 from settings import settings
 from agents.dashboard_agent import dashboard_agent
-from api.dashboard_config import router as dashboard_router
+from api.dashboard_config import dashboard_config_router as dashboard_router
 from api.agent_state import agent_state_router
-from api.dashboard_evaluation import dashboard_evaluation_router
 from api.sql_dependency import sql_dependency_router
 
 redis_url = f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}"
@@ -48,7 +47,6 @@ app.add_middleware(
 
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(agent_state_router, prefix="/api")
-app.include_router(dashboard_evaluation_router, prefix="/api")
 app.include_router(sql_dependency_router, prefix="/api")
 
 @app.post("/")

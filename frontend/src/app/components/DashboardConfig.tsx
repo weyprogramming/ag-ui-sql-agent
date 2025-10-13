@@ -7,12 +7,17 @@ import PandasDataFrame from "./PandasDataFrame";
 import PlotlyFigure from "./PlotlyFigure";
 import CreateSqlDependencyButton from "./CreateSqlDependencyButton";
 
-import { accesifyClient, type SqlDependencyModel } from "@/sdk";
+import {
+    accesifyClient,
+    type DashboardEvaluationRequest,
+    type DashboardEvaluationResponse,
+    type SqlDependencyModel,
+} from "@/sdk";
 import type { components } from "../types/accesify";
 
 type AgentState = components["schemas"]["DashboardState"];
 type DashboardParameter = components["schemas"]["DashboardSQLQueryParameter"];
-type DashboardEvaluationResult = components["schemas"]["DashboardEvaluationResult"];
+type DashboardParameterValue = components["schemas"]["DashboardSQLQueryParameterValue"];
 
 function defaultParameterValue(param: DashboardParameter): string {
     const { default_value } = param;
@@ -100,10 +105,12 @@ export default function DashboardState() {
         [setState]
     );
 
-    const [activeTab, setActiveTab] = useState<"dataframe" | "figure">("figure");
+    const [activeTab, setActiveTab] = useState<"dataframe" | "figure" | "query">(
+        "figure"
+    );
     const [parameterValues, setParameterValues] = useState<Record<string, string>>({});
     const [evaluationResult, setEvaluationResult] =
-        useState<DashboardEvaluationResult | null>(null);
+        useState<DashboardEvaluationResponse | null>(null);
     const [isEvaluating, setIsEvaluating] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -132,8 +139,8 @@ export default function DashboardState() {
         });
     }, [parameters]);
 
-    const displayedDataFrame = evaluationResult?.data_frame ?? state.test_dataframe;
-    const displayedFigure = evaluationResult?.figure ?? state.test_figure;
+    const displayedDataFrame = evaluationResult?.data_frame ?? state.default_dataframe;
+    const displayedFigure = evaluationResult?.figure ?? state.default_figure;
 
     const handleInputChange = (name: string, value: string) => {
         setParameterValues((previous) => ({ ...previous, [name]: value }));
@@ -149,17 +156,19 @@ export default function DashboardState() {
         setErrorMessage(null);
 
         try {
-            const parameterValuesPayload = parameters.map((parameter) => {
+            const parameterValuesPayload: DashboardParameterValue[] = parameters.map(
+                (parameter) => {
                 const rawValue = parameterValues[parameter.name] ?? "";
                 if (!rawValue.length) {
                     throw new Error(`Parameter "${parameter.name}" requires a value.`);
                 }
 
-                return {
-                    name: parameter.name,
-                    value: parseParameterValue(rawValue, parameter),
-                };
-            });
+                    return {
+                        parameter,
+                        value: parseParameterValue(rawValue, parameter),
+                    };
+                }
+            );
 
             const parametrizedQuery =
                 dashboardConfig.dashboard_sql_query?.parametrized_query;
@@ -167,18 +176,34 @@ export default function DashboardState() {
                 throw new Error("Dashboard SQL query is missing.");
             }
 
-            const evaluationPayload = {
+            const sqlDependencyId =
+                dashboardConfig.dashboard_sql_query?.sql_dependency_id;
+            if (!sqlDependencyId) {
+                throw new Error("Dashboard SQL dependency is missing.");
+            }
+
+            const chartConfig = dashboardConfig.chart_config;
+            if (!chartConfig) {
+                throw new Error("Dashboard chart configuration is missing.");
+            }
+
+            const evaluationPayload: DashboardEvaluationRequest = {
                 dashboard_evaluation_sql_query: {
+                    sql_dependency_id: sqlDependencyId,
                     parametrized_query: parametrizedQuery,
                     dashboard_sql_query_parameter_values: parameterValuesPayload,
                 },
-                chart_config: dashboardConfig.chart_config,
+                chart_config: chartConfig,
             };
 
-            const result = await accesifyClient.evaluateDashboard(evaluationPayload as any);
+            const result = await accesifyClient.evaluateDashboard(evaluationPayload);
             setEvaluationResult(result);
             if (result.figure) {
                 setActiveTab("figure");
+            } else if (result.data_frame) {
+                setActiveTab("dataframe");
+            } else if (dashboardConfig.dashboard_sql_query?.parametrized_query) {
+                setActiveTab("query");
             } else {
                 setActiveTab("dataframe");
             }
@@ -210,17 +235,6 @@ export default function DashboardState() {
 
                     {dashboardConfig ? (
                         <div className="space-y-4">
-                            <div>
-                                <h3 className="mb-2 text-sm font-medium text-gray-700">
-                                    SQL Query
-                                </h3>
-                                <SQLMarkdown
-                                    query={
-                                        dashboardConfig.dashboard_sql_query?.parametrized_query ??
-                                        ""
-                                    }
-                                />
-                            </div>
 
                             <form className="space-y-4" onSubmit={handleSubmit}>
                                 <div className="grid gap-4 sm:grid-cols-2">
@@ -327,6 +341,16 @@ export default function DashboardState() {
                             >
                                 Figure
                             </button>
+                            <button
+                                onClick={() => setActiveTab("query")}
+                                className={`${
+                                    activeTab === "query"
+                                        ? "border-blue-500 text-blue-600"
+                                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                                } whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium transition-colors`}
+                            >
+                                SQL Query
+                            </button>
                         </nav>
                     </div>
 
@@ -345,6 +369,21 @@ export default function DashboardState() {
                                 layout={displayedFigure.layout}
                                 config={displayedFigure.config}
                             />
+                        )}
+
+                        {activeTab === "query" && (
+                            dashboardConfig?.dashboard_sql_query?.parametrized_query ? (
+                                <SQLMarkdown
+                                    query={
+                                        dashboardConfig.dashboard_sql_query.parametrized_query
+                                    }
+                                />
+                            ) : (
+                                <p className="text-sm text-gray-500">
+                                    No SQL query available yet. Ask the agent to create one to
+                                    view it here.
+                                </p>
+                            )
                         )}
 
                         {activeTab === "dataframe" && !displayedDataFrame && (

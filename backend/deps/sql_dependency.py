@@ -18,9 +18,6 @@ from pandas import DataFrame, read_sql_query
 
 
 from settings import settings
-from results.dashboard_config_results import DashboardSQLQueryResult
-from results.tool_results import PandasDataFrame
-from schemas.dashboard_evaluation import DashboardEvaluationRequest, DashboardEvaluationSQLQuery, DashboardEvaluationResult
 
 class SQLType(StrEnum):
     MSSQL = "mssql"
@@ -356,53 +353,3 @@ class SQLBaseDependency(BaseModel):
                     return column
                 
         return None
-    
-    
-    def test_dashboard_sql_query(self, dashboard_sql_query: DashboardSQLQueryResult) -> PandasDataFrame:
-        
-        query = dashboard_sql_query.parametrized_query
-        
-        for parameter in dashboard_sql_query.dashboard_sql_query_parameters:
-            
-            query = query.replace(
-                "{" + parameter.name + "}",
-                repr(parameter.default_value)
-            )
-            
-        df = self.get_dataframe_from_query(query)
-        
-        return PandasDataFrame.model_validate(df.to_dict(orient="split"))
-    
-    def execute_dashboard_evaluation_sql_query(
-        self,
-        dashboard_evaluation_sql_query: DashboardEvaluationSQLQuery
-    ) -> PandasDataFrame:
-        
-        query = dashboard_evaluation_sql_query.parametrized_query
-        
-        for parameter in dashboard_evaluation_sql_query.dashboard_sql_query_parameter_values:
-            
-            query = query.replace(
-                "{" + parameter.parameter_config.name + "}",
-                repr(parameter.value)
-            )
-            
-        df = self.get_dataframe_from_query(query=query)
-        
-        return PandasDataFrame.from_dataframe(df=df)
-    
-    def execute_dashboard_evaluation(
-        self,
-        dashboard_evaluation_request: DashboardEvaluationRequest
-    ) -> DashboardEvaluationResult:
-        
-        dataframe = self.execute_dashboard_evaluation_sql_query(
-            dashboard_evaluation_sql_query=dashboard_evaluation_request.dashboard_evaluation_sql_query
-        )
-        
-        chart = dashboard_evaluation_request.chart_config.get_figure(dataframe=DataFrame(**dataframe.model_dump()))
-        
-        return DashboardEvaluationResult(
-            data_frame=dataframe,
-            figure=chart
-        )

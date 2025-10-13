@@ -14,7 +14,25 @@ export interface paths {
         /** Get Dashboards */
         get: operations["get_dashboards_api_dashboard_config_get"];
         put?: never;
-        post?: never;
+        /** Create Dashboard Config */
+        post: operations["create_dashboard_config_api_dashboard_config_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dashboard-config/evaluate-state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Evaluate Dashboard Config From State */
+        post: operations["evaluate_dashboard_config_from_state_api_dashboard_config_evaluate_state_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -32,23 +50,6 @@ export interface paths {
         get: operations["get_agent_state_api_state__state_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/dashboard-evaluation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Evaluate Dashboard */
-        post: operations["evaluate_dashboard_api_dashboard_evaluation_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -515,24 +516,48 @@ export interface components {
             [key: string]: unknown;
         };
         /** DashboardConfigState */
-        DashboardConfigState: {
+        "DashboardConfigState-Input": {
+            dashboard_sql_query?: components["schemas"]["DashboardSQLQueryState"] | null;
+            /** Chart Config */
+            chart_config?: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"] | null;
+        };
+        /** DashboardConfigState */
+        "DashboardConfigState-Output": {
             dashboard_sql_query?: components["schemas"]["DashboardSQLQueryState"] | null;
             /** Chart Config */
             chart_config?: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"] | null;
         };
         /** DashboardEvaluationRequest */
-        DashboardEvaluationRequest: {
-            dashboard_evaluation_sql_query: components["schemas"]["DashboardEvaluationSQLQuery"];
+        "DashboardEvaluationRequest-Input": {
+            dashboard_evaluation_sql_query: components["schemas"]["DashboardEvaluationSQLQuery-Input"];
             /** Chart Config */
             chart_config: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"];
         };
-        /** DashboardEvaluationResult */
-        DashboardEvaluationResult: {
+        /** DashboardEvaluationRequest */
+        "DashboardEvaluationRequest-Output": {
+            dashboard_evaluation_sql_query: components["schemas"]["DashboardEvaluationSQLQuery-Output"];
+            /** Chart Config */
+            chart_config: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"];
+        };
+        /** DashboardEvaluationResponse */
+        DashboardEvaluationResponse: {
+            dashboard_evaluation_request: components["schemas"]["DashboardEvaluationRequest-Output"];
             data_frame: components["schemas"]["PandasDataFrame"];
             figure: components["schemas"]["PlotlyFigure"];
         };
         /** DashboardEvaluationSQLQuery */
-        DashboardEvaluationSQLQuery: {
+        "DashboardEvaluationSQLQuery-Input": {
+            /** Sql Dependency Id */
+            sql_dependency_id: string;
+            /** Parametrized Query */
+            parametrized_query: string;
+            /** Dashboard Sql Query Parameter Values */
+            dashboard_sql_query_parameter_values: components["schemas"]["DashboardSQLQueryParameterValue"][];
+        };
+        /** DashboardEvaluationSQLQuery */
+        "DashboardEvaluationSQLQuery-Output": {
+            /** Sql Dependency Id */
+            sql_dependency_id: string;
             /** Parametrized Query */
             parametrized_query: string;
             /** Dashboard Sql Query Parameter Values */
@@ -574,8 +599,7 @@ export interface components {
         };
         /** DashboardSQLQueryParameterValue */
         DashboardSQLQueryParameterValue: {
-            /** Name */
-            name: string;
+            parameter: components["schemas"]["DashboardSQLQueryParameter"];
             /** Value */
             value: string | number | boolean;
         };
@@ -597,9 +621,9 @@ export interface components {
         /** DashboardState */
         DashboardState: {
             /** @default {} */
-            dashboard_config: components["schemas"]["DashboardConfigState"];
-            test_dataframe?: components["schemas"]["PandasDataFrame"] | null;
-            test_figure?: components["schemas"]["PlotlyFigure"] | null;
+            dashboard_config: components["schemas"]["DashboardConfigState-Output"];
+            default_dataframe?: components["schemas"]["PandasDataFrame"] | null;
+            default_figure?: components["schemas"]["PlotlyFigure"] | null;
             /** Selected Sql Dependency Id */
             selected_sql_dependency_id?: string | null;
         };
@@ -1617,6 +1641,72 @@ export interface operations {
             };
         };
     };
+    create_dashboard_config_api_dashboard_config_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DashboardConfigState-Input"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardConfigModel"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluate_dashboard_config_from_state_api_dashboard_config_evaluate_state_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DashboardEvaluationRequest-Input"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardEvaluationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_agent_state_api_state__state_id__get: {
         parameters: {
             query?: never;
@@ -1635,39 +1725,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DashboardState"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    evaluate_dashboard_api_dashboard_evaluation_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DashboardEvaluationRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DashboardEvaluationResult"];
                 };
             };
             /** @description Validation Error */

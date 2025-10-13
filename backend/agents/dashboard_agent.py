@@ -96,15 +96,13 @@ async def save_dashboard_sql_query(
     ctx.deps.state.dashboard_config.dashboard_sql_query = dashboard_sql_query
     
     try:
-        test_dataframe = await ctx.deps.state.evaluate_test_dataframe()
+        await ctx.deps.state.evaluate_default_dataframe()
         
     except Exception as exc:
         raise ModelRetry(f"Error while executing test SQL query: {exc}") from exc
     
-    ctx.deps.state.test_dataframe = test_dataframe
-    
     return ToolReturn(
-        return_value=ctx.deps.state.test_dataframe,
+        return_value=ctx.deps.state.default_dataframe.model_dump_json(),
         metadata=[
             StateSnapshotEvent(
                 type=EventType.STATE_SNAPSHOT,
@@ -114,7 +112,7 @@ async def save_dashboard_sql_query(
     )
     
 @dashboard_agent.tool(retries=5)
-async def create_dashboard_config(
+async def create_chart_dashboard_config(
     ctx: RunContext[StateDeps[DashboardState]],
     chart_config: BoxChartConfig | ScatterChartConfig | PieChartConfig | LineChartConfig | HistogramChartConfig | BarChartConfig
 ) -> StateSnapshotEvent:
@@ -126,10 +124,8 @@ async def create_dashboard_config(
     if ctx.deps.state.dashboard_config.dashboard_sql_query is None:
         raise ModelRetry("No SQL query configured for the dashboard")
     
-    ctx.deps.state.dashboard_config.chart_config = chart_config
-    ctx.deps.state.test_figure = chart_config.get_figure(
-        dataframe=ctx.deps.state.test_dataframe.to_dataframe()
-    )
+    ctx.deps.state.dashboard_config.chart_config = chart_config  
+    ctx.deps.state.evaluate_default_figure()
     
     return ToolReturn(
         return_value=ctx.deps.state.dashboard_config,
