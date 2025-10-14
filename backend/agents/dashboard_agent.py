@@ -161,7 +161,7 @@ async def execute_sql_query(
     try:
         result_df = await asyncio.wait_for(
             asyncio.to_thread(sql_dependency.get_dataframe_from_query, query),
-            timeout=30
+            timeout=180
         )
         result = PandasDataFrame.from_dataframe(result_df.head(n=n))
 

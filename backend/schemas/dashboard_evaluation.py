@@ -23,7 +23,7 @@ class DashboardEvaluationSQLQuery(BaseModel):
     parametrized_query: str
     dashboard_sql_query_parameter_values: List[DashboardSQLQueryParameterValue]
     
-    async def evaluate(self, timeout: int = 30) -> PandasDataFrame:
+    async def evaluate(self, timeout: int = 180) -> PandasDataFrame:
         
         sql_dependency = await SQLBaseDependencyModel.get(pk=self.sql_dependency_id)
         
