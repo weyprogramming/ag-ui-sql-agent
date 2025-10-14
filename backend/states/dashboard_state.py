@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import List
 
 from pydantic import BaseModel, computed_field
 
@@ -12,7 +13,7 @@ from schemas.dashboard_evaluation import DashboardSQLQueryParameterValue, Dashbo
 class DashboardState(BaseModel):
     dashboard_config: DashboardConfigState = DashboardConfigState()
     default_dataframe: PandasDataFrame | None = None
-    default_figure: PlotlyFigure | None = None
+    default_figures: List[PlotlyFigure] = []
     selected_sql_dependency_id: str | None = None
 
     async def evaluate_default_dataframe(self) -> None:
@@ -36,14 +37,14 @@ class DashboardState(BaseModel):
         
         self.default_dataframe = await dashboard_evaluation_sql_query.evaluate()
         
-    def evaluate_default_figure(self) -> None:
+    def evaluate_default_figures(self) -> None:
         if self.default_dataframe is None:
             raise ValueError("Default dataframe is not set")
-        
-        if self.dashboard_config.chart_config is None:
-            raise ValueError("Chart configuration is not set")
 
-        self.default_figure = self.dashboard_config.chart_config.get_figure(dataframe=self.default_dataframe.to_dataframe())
+        if not self.dashboard_config.figure_configs:
+            raise ValueError("Figure configuration is not set")
+
+        self.default_figures = [fig.get_figure(dataframe=self.default_dataframe.to_dataframe()) for fig in self.dashboard_config.figure_configs]
 
     async def get_sql_dependency(self) -> SQLBaseDependencyModel:
 

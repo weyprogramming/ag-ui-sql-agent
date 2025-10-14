@@ -29,6 +29,10 @@ class PandasDataFrame(BaseModel):
     def to_dataframe(self) -> DataFrame:
         return DataFrame(**self.model_dump())
     
+    def head(self, n: int = 5) -> PandasDataFrame:
+        df = self.to_dataframe().head(n)
+        return PandasDataFrame.from_dataframe(df)
+    
     
 class PlotlyFigure(BaseModel):
     data: List[Dict]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+
 from datetime import datetime, date, time
 
 from typing import List
@@ -21,7 +23,7 @@ class DashboardEvaluationSQLQuery(BaseModel):
     parametrized_query: str
     dashboard_sql_query_parameter_values: List[DashboardSQLQueryParameterValue]
     
-    async def evaluate(self) -> PandasDataFrame:
+    async def evaluate(self, timeout: int = 30) -> PandasDataFrame:
         
         sql_dependency = await SQLBaseDependencyModel.get(pk=self.sql_dependency_id)
         
@@ -43,30 +45,35 @@ class DashboardEvaluationSQLQuery(BaseModel):
                 value_str = str(param_value.value)
             
             evaluated_query = evaluated_query.replace(placeholder, value_str)
-            
-        return PandasDataFrame.from_dataframe(sql_dependency.get_dataframe_from_query(evaluated_query))
-        
+
+        df = await asyncio.wait_for(
+            fut=asyncio.to_thread(sql_dependency.get_dataframe_from_query, evaluated_query),
+            timeout=timeout
+        )
+
+        return PandasDataFrame.from_dataframe(df)
+
 
 class DashboardEvaluationRequest(BaseModel):
     dashboard_evaluation_sql_query: DashboardEvaluationSQLQuery
-    chart_config: BoxChartConfig | ScatterChartConfig | PieChartConfig | LineChartConfig | HistogramChartConfig | BarChartConfig
+    figure_configs: List[BoxChartConfig | ScatterChartConfig | PieChartConfig | LineChartConfig | HistogramChartConfig | BarChartConfig]
     
     async def evaluate(self) -> DashboardEvaluationResponse:
-        
-        if self.chart_config is None:
-            raise ValueError("Chart configuration is not set")
+
+        if not self.figure_configs:
+            raise ValueError("Figure configuration is not set")
         
         df = await self.dashboard_evaluation_sql_query.evaluate()
         
-        fig = self.chart_config.get_figure(dataframe=df.to_dataframe())
+        figures = [fig.get_figure(dataframe=df.to_dataframe()) for fig in self.figure_configs]
         
         return DashboardEvaluationResponse(
             dashboard_evaluation_request=self,
             data_frame=df,
-            figure=fig
+            figures=figures
         )
 
 class DashboardEvaluationResponse(BaseModel):
     dashboard_evaluation_request: DashboardEvaluationRequest
     data_frame: PandasDataFrame
-    figure: PlotlyFigure
+    figures: List[PlotlyFigure]

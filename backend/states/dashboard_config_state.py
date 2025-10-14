@@ -21,12 +21,12 @@ class DashboardSQLQueryState(DashboardSQLQueryResult):
 
 class DashboardConfigState(BaseModel):
     dashboard_sql_query: DashboardSQLQueryState | None = None
-    chart_config: BoxChartConfig | ScatterChartConfig | PieChartConfig | LineChartConfig | HistogramChartConfig | BarChartConfig | None = None
+    figure_configs: List[BoxChartConfig | ScatterChartConfig | PieChartConfig | LineChartConfig | HistogramChartConfig | BarChartConfig] = []
     
     async def get_default_values_result(self) -> DashboardEvaluationResponse:
         
-        if self.dashboard_sql_query is None or self.chart_config is None:
-            raise ValueError("Dashboard SQL query or chart configuration is not set")
+        if self.dashboard_sql_query is None or not len(self.figure_configs):
+            raise ValueError("Dashboard SQL query or figure configuration is not set")
         
         parameter_values: List[DashboardSQLQueryParameterValue] = [
             DashboardSQLQueryParameterValue(
@@ -42,7 +42,7 @@ class DashboardConfigState(BaseModel):
                 parametrized_query=self.dashboard_sql_query.parametrized_query,
                 dashboard_sql_query_parameter_values=parameter_values
             ),
-            chart_config=self.chart_config
+            chart_config=self.figure_configs
         )
         
         return await evaluation_request.evaluate()

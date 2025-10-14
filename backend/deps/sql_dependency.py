@@ -4,6 +4,8 @@ import json
 
 from typing import TypedDict, Optional, List, Self
 
+from textwrap import dedent
+
 from enum import StrEnum
 
 from uuid import UUID, uuid4
@@ -60,7 +62,13 @@ class ColumnDict(TypedDict):
 class TableDict(TypedDict):
     id: str
     name: str
-    columns: List[ColumnDict]
+    description: Optional[str]
+    comment: Optional[str]
+    columns: Optional[List[ColumnDict]]
+    
+class SQLDependencyDict(TypedDict):
+    name: str
+    tables: List[TableDict]
     
 class SQLJoin(BaseModel):
     table: str
@@ -89,7 +97,7 @@ class SQLDatabaseTable(BaseModel):
     comment: str | None
     columns: list[SQLTableColumn] = []
     
-    def get_dict(self, short: bool = False, table_subset: list[SQLDatabaseTable] | None = None, include_table_id: bool = False, include_column_ids: bool = False) -> dict:
+    def get_dict(self, short: bool = False, table_subset: list[SQLDatabaseTable] | None = None, include_table_id: bool = False, include_column_ids: bool = False) -> TableDict:
             
         table_dict: TableDict = {
             "table_name": self.table_name,
@@ -160,6 +168,21 @@ class SQLDatabaseTable(BaseModel):
                 column.exclude = True
             else:
                 column.exclude = False
+
+    def get_instruction_dict(self) -> TableDict:
+        
+        table_dict: TableDict = {
+            "id": str(self.id),
+            "name": self.table_name
+        }
+        
+        if self.description:
+            table_dict["description"] = self.description
+            
+        if self.comment:
+            table_dict["comment"] = self.comment
+            
+        return table_dict
 
 
 
@@ -323,10 +346,10 @@ class SQLBaseDependency(BaseModel):
         return df
     
     def get_table_by_id(self, table_id: UUID) -> SQLDatabaseTable:
-        return next(
-            (table for table in self.tables if table.id == table_id),
-            None
-        )
+        for table in self.tables:
+            if table.id == table_id:
+                return table
+        raise ValueError(f"Table with id {table_id} not found")
     
     def get_tables_by_ids(self, table_ids: list[UUID]) -> list[SQLDatabaseTable]:
         return [
@@ -353,3 +376,35 @@ class SQLBaseDependency(BaseModel):
                     return column
                 
         return None
+    
+    
+    def get_instruction_dict(self) -> SQLDependencyDict:
+        
+        sql_dep_instruction_dict = SQLDependencyDict(
+            name=self.name,
+            tables=[table.get_instruction_dict() for table in self.tables]
+        )
+        
+        return sql_dep_instruction_dict
+    
+    def get_instruction_prompt(self) -> str:
+        return json.dumps(self.get_instruction_dict(), indent=4)
+    
+    def get_dialect_prompt(self) -> str:
+        
+        if self.connection_params.type == SQLType.MSSQL:
+            return dedent("""
+                IMPORTANT: Use T-SQL syntax for Microsoft SQL Server (MSSQL).
+            """)
+            
+        elif self.connection_params.type == SQLType.MYSQL:
+            return dedent("""
+                IMPORTANT: Use MySQL syntax for MySQL databases.
+            """)
+            
+        elif self.connection_params.type == SQLType.POSTGRES:
+            return dedent("""
+                IMPORTANT: Use PostgreSQL syntax for PostgreSQL databases.
+            """)
+            
+        
