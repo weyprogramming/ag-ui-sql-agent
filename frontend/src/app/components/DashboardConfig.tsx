@@ -113,6 +113,7 @@ export default function DashboardState() {
         useState<DashboardEvaluationResponse | null>(null);
     const [isEvaluating, setIsEvaluating] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [selectedFigureIndex, setSelectedFigureIndex] = useState(0);
 
     const dashboardConfig = state.dashboard_config ?? null;
 
@@ -140,7 +141,7 @@ export default function DashboardState() {
     }, [parameters]);
 
     const displayedDataFrame = evaluationResult?.data_frame ?? state.default_dataframe;
-    const displayedFigure = evaluationResult?.figure ?? state.default_figure;
+    const displayedFigures = evaluationResult?.figures ?? state.default_figures;
 
     const handleInputChange = (name: string, value: string) => {
         setParameterValues((previous) => ({ ...previous, [name]: value }));
@@ -182,9 +183,9 @@ export default function DashboardState() {
                 throw new Error("Dashboard SQL dependency is missing.");
             }
 
-            const chartConfig = dashboardConfig.chart_config;
-            if (!chartConfig) {
-                throw new Error("Dashboard chart configuration is missing.");
+            const figureConfigs = dashboardConfig.figure_configs;
+            if (!figureConfigs) {
+                throw new Error("Dashboard figure configuration is missing.");
             }
 
             const evaluationPayload: DashboardEvaluationRequest = {
@@ -193,12 +194,12 @@ export default function DashboardState() {
                     parametrized_query: parametrizedQuery,
                     dashboard_sql_query_parameter_values: parameterValuesPayload,
                 },
-                chart_config: chartConfig,
+                figure_configs: figureConfigs,
             };
 
             const result = await accesifyClient.evaluateDashboard(evaluationPayload);
             setEvaluationResult(result);
-            if (result.figure) {
+            if (result.figures && result.figures.length > 0) {
                 setActiveTab("figure");
             } else if (result.data_frame) {
                 setActiveTab("dataframe");
@@ -363,12 +364,33 @@ export default function DashboardState() {
                             />
                         )}
 
-                        {activeTab === "figure" && displayedFigure && (
-                            <PlotlyFigure
-                                data={displayedFigure.data}
-                                layout={displayedFigure.layout}
-                                config={displayedFigure.config}
-                            />
+                        {activeTab === "figure" && displayedFigures && displayedFigures.length > 0 && (
+                            <div className="space-y-4">
+                                {displayedFigures.length > 1 && (
+                                    <div className="flex items-center gap-2">
+                                        <label htmlFor="figure-select" className="text-sm font-medium text-gray-700">
+                                            Select Figure:
+                                        </label>
+                                        <select
+                                            id="figure-select"
+                                            value={selectedFigureIndex}
+                                            onChange={(e) => setSelectedFigureIndex(Number(e.target.value))}
+                                            className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            {displayedFigures.map((_, index) => (
+                                                <option key={index} value={index}>
+                                                    Figure {index + 1}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                                <PlotlyFigure
+                                    data={displayedFigures[selectedFigureIndex]?.data}
+                                    layout={displayedFigures[selectedFigureIndex]?.layout}
+                                    config={displayedFigures[selectedFigureIndex]?.config}
+                                />
+                            </div>
                         )}
 
                         {activeTab === "query" && (
@@ -391,8 +413,7 @@ export default function DashboardState() {
                                 No data available yet. Evaluate the dashboard to view results.
                             </p>
                         )}
-
-                        {activeTab === "figure" && !displayedFigure && (
+                        {activeTab === "figure" && (!displayedFigures || displayedFigures.length === 0) && (
                             <p className="text-sm text-gray-500">
                                 No figure available yet. Evaluate the dashboard to view the
                                 chart.

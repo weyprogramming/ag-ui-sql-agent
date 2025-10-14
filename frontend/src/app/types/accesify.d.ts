@@ -518,32 +518,39 @@ export interface components {
         /** DashboardConfigState */
         "DashboardConfigState-Input": {
             dashboard_sql_query?: components["schemas"]["DashboardSQLQueryState"] | null;
-            /** Chart Config */
-            chart_config?: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"] | null;
+            /**
+             * Figure Configs
+             * @default []
+             */
+            figure_configs: (components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"])[];
         };
         /** DashboardConfigState */
         "DashboardConfigState-Output": {
             dashboard_sql_query?: components["schemas"]["DashboardSQLQueryState"] | null;
-            /** Chart Config */
-            chart_config?: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"] | null;
+            /**
+             * Figure Configs
+             * @default []
+             */
+            figure_configs: (components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"])[];
         };
         /** DashboardEvaluationRequest */
         "DashboardEvaluationRequest-Input": {
             dashboard_evaluation_sql_query: components["schemas"]["DashboardEvaluationSQLQuery-Input"];
-            /** Chart Config */
-            chart_config: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"];
+            /** Figure Configs */
+            figure_configs: (components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"])[];
         };
         /** DashboardEvaluationRequest */
         "DashboardEvaluationRequest-Output": {
             dashboard_evaluation_sql_query: components["schemas"]["DashboardEvaluationSQLQuery-Output"];
-            /** Chart Config */
-            chart_config: components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"];
+            /** Figure Configs */
+            figure_configs: (components["schemas"]["BoxChartConfig"] | components["schemas"]["ScatterChartConfig"] | components["schemas"]["PieChartConfig"] | components["schemas"]["LineChartConfig"] | components["schemas"]["HistogramChartConfig"] | components["schemas"]["BarChartConfig"])[];
         };
         /** DashboardEvaluationResponse */
         DashboardEvaluationResponse: {
             dashboard_evaluation_request: components["schemas"]["DashboardEvaluationRequest-Output"];
             data_frame: components["schemas"]["PandasDataFrame"];
-            figure: components["schemas"]["PlotlyFigure"];
+            /** Figures */
+            figures: components["schemas"]["PlotlyFigure"][];
         };
         /** DashboardEvaluationSQLQuery */
         "DashboardEvaluationSQLQuery-Input": {
@@ -620,10 +627,16 @@ export interface components {
         };
         /** DashboardState */
         DashboardState: {
-            /** @default {} */
+            /** @default {
+             *       "figure_configs": []
+             *     } */
             dashboard_config: components["schemas"]["DashboardConfigState-Output"];
             default_dataframe?: components["schemas"]["PandasDataFrame"] | null;
-            default_figure?: components["schemas"]["PlotlyFigure"] | null;
+            /**
+             * Default Figures
+             * @default []
+             */
+            default_figures: components["schemas"]["PlotlyFigure"][];
             /** Selected Sql Dependency Id */
             selected_sql_dependency_id?: string | null;
         };
