@@ -159,9 +159,9 @@ export default function Chat() {
                 <div className="mt-2 max-h-[500px] overflow-y-auto">
                   <div className="py-5 px-2">
                     <PlotlyFigure
-                      data={result.figure.data}
-                      layout={result.figure.layout}
-                      config={result.figure.config}
+                      data={result.data}
+                      layout={result.layout}
+                      config={result.config}
                     />
                   </div>
                 </div>

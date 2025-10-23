@@ -267,7 +267,7 @@ async def add_dashboard_figure_config(
     ctx.deps.state.evaluate_default_figures()
     
     return ToolReturn(
-        return_value=ctx.deps.state.default_figures[-1].model_dump_json(),
+        return_value=ctx.deps.state.default_figures[-1],
         metadata=[
             StateSnapshotEvent(
                 type=EventType.STATE_SNAPSHOT,

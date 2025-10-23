@@ -35,7 +35,9 @@ class DashboardState(BaseModel):
             ]
         )
         
-        self.default_dataframe = await dashboard_evaluation_sql_query.evaluate()
+        default_dataframe = await dashboard_evaluation_sql_query.evaluate()
+        self.default_dataframe = default_dataframe
+        
         
     def evaluate_default_figures(self) -> None:
         if self.default_dataframe is None:

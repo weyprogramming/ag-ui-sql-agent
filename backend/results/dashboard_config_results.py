@@ -18,7 +18,7 @@ class DashboardSQLQueryParameter(BaseModel):
         description="The type of the parameter, e.g. 'str', 'int', 'float', 'date', 'bool', 'datetime', or 'time'"
     )
     default_value: str | int | float | date | bool | datetime | time = Field(
-        description="An example value for the parameter, e.g. 'example' for a str parameter"
+        description="A default value for the parameter"
     )
 
 class DashboardSQLQueryResult(BaseModel):
